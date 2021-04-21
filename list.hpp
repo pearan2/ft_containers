@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 14:44:46 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/21 23:39:19 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/22 00:33:46 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ namespace ft
 			{
 
 			}
-			node(node* prev, node* next, T& value) : prev(prev), next(next), value(value)
+			node(node* prev, node* next, const T& value) : prev(prev), next(next), value(value)
 			{
 				
 			}
@@ -69,7 +69,12 @@ namespace ft
 				return (this->next);
 			}
 
-			T		getValue(void)
+			const T&getValue(void) const
+			{
+				return (this->value);
+			}
+
+			T&		getValue(void)
 			{
 				return (this->value);
 			}
@@ -89,7 +94,6 @@ namespace ft
 			}
 
 			//new with value
-			
 			node*	clone_with_value(void)
 			{
 				return (new node(NULL, NULL, this->value));
@@ -126,34 +130,87 @@ namespace ft
 			//						constructor start						//
 			//////////////////////////////////////////////////////////////////
 			//default
-			explicit list (const Alloc& alloc = Alloc())
+			explicit list (const Alloc& alloc = Alloc()) : head(NULL), tail(NULL), number_of_node(0)
 			{
 				std::cout << "default constructor called" << std::endl;
 			}
 			
 			//fill
-			explicit list (size_type n, const value_type& val = value_type(), const Alloc& alloc = Alloc())
+			explicit list (size_type n, const value_type& val = value_type(), const Alloc& alloc = Alloc()) : head(NULL), tail(NULL), number_of_node(0)
 			{
 				std::cout << "fill constructor called" << std::endl;
 			}
 
 			//range
 			template <class InputIterator, typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type>
-  			list (InputIterator first, InputIterator last, const Alloc& alloc = Alloc())
+  			list (InputIterator first, InputIterator last, const Alloc& alloc = Alloc()) : head(NULL), tail(NULL), number_of_node(0)
 			{
 				std::cout << "range constructor called" << std::endl;
 			}
 
 			//copy
-			list (const list& origin)
+			list (const list& origin) : head(NULL), tail(NULL), number_of_node(0)
 			{
-				
+				std::cout << "copy constructor called" << std::endl;
 			}
-
 			//////////////////////////////////////////////////////////////////
 			//						constructor end							//
 			//////////////////////////////////////////////////////////////////
 
+
+			//////////////////////////////////////////////////////////////////
+			//						Modifiers start							//
+			//////////////////////////////////////////////////////////////////
+			void push_back (const value_type& val)
+			{
+				Alnod alloc;
+
+				node<T> node_stack(NULL, NULL, val);
+				node<T> * node_tmp = alloc.allocate(1);
+				alloc.construct(node_tmp, node_stack);
+
+				if (this->number_of_node == 0)
+				{
+					this->head = node_tmp;
+					this->tail = node_tmp;
+				}
+				else
+				{
+					this->tail->setNext(node_tmp);
+					node_tmp->setPrev(this->tail);
+					this->tail = node_tmp;
+				}
+				this->number_of_node++;
+			}
+			//////////////////////////////////////////////////////////////////
+			//						Modifiers end							//
+			//////////////////////////////////////////////////////////////////
+
+			//////////////////////////////////////////////////////////////////
+			//						Element access start					//
+			//////////////////////////////////////////////////////////////////
+			reference front()
+			{
+				return (head->getValue());
+			}
+
+			const_reference front() const
+			{
+				return (head->getValue());
+			}
+
+			reference back()
+			{
+				return (tail->getValue());
+			}
+
+			const_reference back() const
+			{
+				return (tail->getValue());
+			}
+			//////////////////////////////////////////////////////////////////
+			//						Element access end						//
+			//////////////////////////////////////////////////////////////////
 	};
 }
 
