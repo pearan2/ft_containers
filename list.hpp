@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 14:44:46 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/22 13:51:14 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/22 16:20:28 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,66 @@ namespace ft
 			}
 	};
 
+	template <typename T>
+	class ListIterator
+	{
+		private	:
+			Node<T> *now;
+			ListIterator(){}
+		public	:
+			ListIterator(Node<T> *now) : now(now)
+			{
+				
+			}
+
+			ListIterator(const ListIterator& origin) : now(origin.now)
+			{
+				
+			}
+
+			ListIterator& operator=(const ListIterator& origin)
+			{
+				this->now = origin.now;
+				return (*this);
+			}
+
+			//*
+			T& operator*() const
+			{
+				return (now->getValue());
+			}
+
+			//++
+			ListIterator& operator++(int)
+			{
+				this->now = this->now->getNext();
+				return (*this);
+			}
+
+			//--
+			ListIterator& operator--()
+			{
+				this->now = this->now->getPrev();
+				return (*this);
+			}
+
+			//->
+			T*			  operator->() const
+			{
+				return &(operator*());
+			}
+
+			bool		  operator==(const ListIterator &origin) const
+			{
+				return (now == origin.now);
+			}
+
+			bool		  operator!=(const ListIterator &origin) const
+			{
+				return (!operator==(origin));
+			}
+	};
+
 	template <class T, class Alloc = std::allocator<T> >
 	class List
 	{
@@ -117,8 +177,8 @@ namespace ft
 			typedef const T &const_reference;
 			typedef T *pointer;
 			typedef const T *const_pointer;
-			//typedef ListIterator<T> iterator;
-			//typedef ListIterator<const T> const_iterator;
+			typedef ListIterator<T> iterator;
+			typedef ListIterator<const T> const_iterator;
 			//typedef ReverseIterator<iterator> reverse_iterator;
 			//typedef ReverseIterator<const_iterator> const_reverse_iterator;
 			typedef std::ptrdiff_t difference_type;
@@ -156,8 +216,37 @@ namespace ft
 				std::cout << "copy constructor called" << std::endl;
 			}
 			//////////////////////////////////////////////////////////////////
-			//						constructor end							//
+			//						Constructor end							//
 			//////////////////////////////////////////////////////////////////
+
+			//////////////////////////////////////////////////////////////////
+			//						Iterators start							//
+			//////////////////////////////////////////////////////////////////
+
+			iterator begin()
+			{
+				return (iterator(head));
+			}
+
+			const_iterator begin() const
+			{
+				return (iterator(head));
+			}
+
+			iterator end()
+			{
+				return (iterator(NULL));
+			}
+
+			const_iterator end() const
+			{
+				return (iterator(NULL));
+			}
+
+			//////////////////////////////////////////////////////////////////
+			//						Iterators end							//
+			//////////////////////////////////////////////////////////////////
+
 
 			//////////////////////////////////////////////////////////////////
 			//						Capacity start							//
@@ -229,7 +318,7 @@ namespace ft
 					push_back(val);
 			}
 
-			void push_back (const value_type& val)
+			void push_front (const value_type& val)
 			{
 				Alnod alloc;
 
@@ -244,9 +333,9 @@ namespace ft
 				}
 				else
 				{
-					this->tail->setNext(Node_tmp);
-					Node_tmp->setPrev(this->tail);
-					this->tail = Node_tmp;
+					this->head->setPrev(Node_tmp);
+					Node_tmp->setNext(this->head);
+					this->head = Node_tmp;
 				}
 				this->number_of_Node++;
 			}
@@ -276,6 +365,28 @@ namespace ft
 				}
 			}
 
+			void push_back (const value_type& val)
+			{
+				Alnod alloc;
+
+				Node<T> Node_stack(NULL, NULL, val);
+				Node<T> * Node_tmp = alloc.allocate(1);
+				alloc.construct(Node_tmp, Node_stack);
+
+				if (this->number_of_Node == 0)
+				{
+					this->head = Node_tmp;
+					this->tail = Node_tmp;
+				}
+				else
+				{
+					this->tail->setNext(Node_tmp);
+					Node_tmp->setPrev(this->tail);
+					this->tail = Node_tmp;
+				}
+				this->number_of_Node++;
+			}
+
 			void pop_back()
 			{
 				Alnod alloc;
@@ -294,6 +405,8 @@ namespace ft
 					this->number_of_Node -= 1;
 				}
 			}
+
+			
 
 			void clear()
 			{

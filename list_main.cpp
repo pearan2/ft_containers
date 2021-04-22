@@ -6,11 +6,25 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 18:56:50 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/22 13:52:12 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/22 16:16:11 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "list.hpp"
+
+
+class test
+{
+	public:
+		int x;
+		int y;
+		test(int x, int y)
+		{
+			this->x = x;
+			this->y = y;
+		}
+};
+
 
 int			main()
 {
@@ -78,25 +92,57 @@ int			main()
   	// std::cout << "\nFinal size of mylist is " << mylist.size() << '\n';
 	// std::cout << "==================== pop_front test end==============" << std::endl;
 
-	std::cout << "==================== pop_back test =================" << std::endl;
+	// std::cout << "==================== pop_back test =================" << std::endl;
  
 
-	ft::List<int> mylist;
-	int sum (0);
-	mylist.push_back (100);
-	mylist.push_back (200);
-	mylist.push_back (300);
+	// ft::List<int> mylist;
+	// int sum (0);
+	// mylist.push_back (100);
+	// mylist.push_back (200);
+	// mylist.push_back (300);
 
-	while (!mylist.empty())
+	// while (!mylist.empty())
+	// {
+	//   sum+=mylist.back();
+	//   mylist.pop_back();
+	// }
+	// std::cout << "The elements of mylist summed " << sum << '\n';
+	// std::cout << "size >> " << mylist.size() << std::endl;
+
+	// std::cout << "==================== pop_back test =================" << std::endl;
+ 
+
+	// std::cout << "==================== pop_front test =================" << std::endl;
+ 
+	// ft::List<int> mylist (2,100);         // two ints with a value of 100
+	// mylist.push_front (200);
+	// mylist.push_front (300);
+	
+	// std::cout << "mylist contains:" << std::endl;
+	// std::cout << mylist.front() << std::endl;
+	// std::cout << mylist.back() << std::endl;
+	// std::cout << mylist.size() << std::endl;
+ 
+	// std::cout << "==================== pop_front test end =============" << std::endl;
+ 
+
+	std::cout << "==================== Iterator test start =============" << std::endl;
+ 
+	ft::List<test> list_test;
+	list_test.push_back(test(3,5));
+	list_test.push_back(test(1,7));
+	list_test.push_back(test(4,4));
+
+	for (ft::List<test>::iterator iter = list_test.begin(); iter != list_test.end(); iter++)
 	{
-	  sum+=mylist.back();
-	  mylist.pop_back();
+		//std::cout << *iter << std::endl;
+		std::cout << "x : " << iter->x << " | y : " << iter->y << std::endl;
 	}
-	std::cout << "The elements of mylist summed " << sum << '\n';
-	std::cout << "size >> " << mylist.size() << std::endl;
-
-	std::cout << "==================== pop_back test =================" << std::endl;
+	//ft::List<test>::iterator iter();
  
+ 	std::cout << "==================== Iterator test end ===============" << std::endl;
+ 
+
 	return 0;
 
 }
