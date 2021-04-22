@@ -6,7 +6,7 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/22 00:27:21 by honlee           ###   ########.fr        #
+#    Updated: 2021/04/22 13:38:40 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,6 +29,7 @@ test		:		fclean
 
 fclean		:		
 					rm -f ${NAME}
+					rm -rf a.out.dSYM
 
 re			:		fclean all
 
