@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
+#    By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/23 11:29:33 by honlee           ###   ########.fr        #
+#    Updated: 2021/04/24 11:21:39 by honlee           ###   ########seoul.kr   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ CF			=		-Wall -Wextra -Werror -std=c++98 ${SRCS}
 DCF			=		-g ${SRCS}
 
 ${NAME}     :       
-					${CC} ${DCF} -o ${NAME}
+					${CC} ${CF} -o ${NAME}
 
 test		:		fclean
 					${CC} ${DCF} -o ${NAME}

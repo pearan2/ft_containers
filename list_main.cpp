@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list_main.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 18:56:50 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/23 14:36:48 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/24 13:27:06 by honlee           ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,37 @@ class test
 			//std::cout << "test class deleted :(" << std::endl;
 		}
 };
+
+bool single_digit (const int& value) { return (value<10); }
+
+// a predicate implemented as a class:
+struct is_odd {
+  bool operator() (const int& value) { return (value%2)==1; }
+};
+
+bool same_integral_part (double first, double second)
+{ return ( int(first)==int(second) ); }
+
+// a binary predicate implemented as a class:
+struct is_near {
+  bool operator() (double first, double second)
+  { return (fabs(first-second)<5.0); }
+};
+
+bool compare_nocase (const std::string& first, const std::string& second)
+{
+  unsigned int i=0;
+  while ( (i<first.length()) && (i<second.length()) )
+  {
+    if (tolower(first[i])<tolower(second[i])) return true;
+    else if (tolower(first[i])>tolower(second[i])) return false;
+    ++i;
+  }
+  return ( first.length() < second.length() );
+}
+
+bool mycomparison (double first, double second)
+{ return ( int(first)<int(second) ); }
 
 int			main()
 {
@@ -228,6 +259,199 @@ int			main()
 
 	std::cout << "=========================== splice test end=====================" << std::endl;
 
-	return 0;
 
+	std::cout << "=========================== remove test start =====================" << std::endl;
+
+
+	int myints_remove[]= {17,89,7,14};
+	ft::list<int> list_remove1(myints_remove,myints_remove+4);
+
+	list_remove1.push_back(89);
+
+	std::cout << "mylist contains:";
+	for (ft::list<int>::iterator it=list_remove1.begin(); it!=list_remove1.end(); ++it)
+		std::cout << ' ' << *it;
+	std::cout << '\n';
+
+
+	list_remove1.remove(89);
+
+	std::cout << "mylist contains:";
+	for (ft::list<int>::iterator it=list_remove1.begin(); it!=list_remove1.end(); ++it)
+		std::cout << ' ' << *it;
+	std::cout << '\n';
+
+	std::cout << "=========================== remove test end=====================" << std::endl;
+
+
+	std::cout << "=========================== remove if test start =======================" << std::endl;
+	
+
+	int myints_remove_if[]= {15,36,7,17,20,39,4,1};
+	ft::list<int> list_remove_if1 (myints_remove_if,myints_remove_if+8);   // 15 36 7 17 20 39 4 1
+
+	list_remove_if1.remove_if (single_digit);           // 15 36 17 20 39
+
+	list_remove_if1.remove_if (is_odd());               // 36 20
+
+	std::cout << "mylist contains:";
+	for (ft::list<int>::iterator it=list_remove_if1.begin(); it!=list_remove_if1.end(); ++it)
+		std::cout << ' ' << *it;
+	std::cout << '\n';
+
+	std::cout << "=========================== remove if test end =======================" << std::endl;
+
+
+	std::cout << "=========================== unique test start =======================" << std::endl;
+
+	double mydoubles_unique[]={ 12.15,  2.72, 73.0,  12.77,  3.14,
+                       12.77, 73.35, 72.25, 15.3,  72.25 };
+	ft::list<double> list_unique1 (mydoubles_unique,mydoubles_unique+10);
+  
+	list_unique1.sort();             //  2.72,  3.14, 12.15, 12.77, 12.77,
+                             // 15.3,  72.25, 72.25, 73.0,  73.35
+
+	list_unique1.unique();
+	for (ft::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
+		std::cout << *iter << " ";
+	std::cout << std::endl;
+
+
+
+
+	list_unique1.unique (same_integral_part);  //  2.72,  3.14, 12.15
+                                       // 15.3,  72.25, 73.0
+	for (ft::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
+		std::cout << *iter << " ";
+	std::cout << std::endl;
+	
+	list_unique1.unique (is_near());           //  2.72, 12.15, 72.25
+	for (ft::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
+		std::cout << *iter << " ";
+	std::cout << std::endl;
+	std::cout << "=========================== unique test end =========================" << std::endl;
+
+	std::cout << "=========================== sort test start =========================" << std::endl;
+	
+	ft::list<std::string> list_sort1;
+	ft::list<std::string>::iterator iter_sort1;
+	list_sort1.push_back ("one");
+	list_sort1.push_back ("two");
+	list_sort1.push_back ("Three");
+
+	list_sort1.sort();
+
+  	std::cout << "mylist contains:";
+	for (iter_sort1=list_sort1.begin(); iter_sort1!=list_sort1.end(); ++iter_sort1)
+		std::cout << ' ' << *iter_sort1;
+	std::cout << '\n';
+
+	list_sort1.sort(compare_nocase);
+
+	std::cout << "mylist contains:";
+	for (iter_sort1=list_sort1.begin(); iter_sort1!=list_sort1.end(); ++iter_sort1)
+		std::cout << ' ' << *iter_sort1;
+	std::cout << '\n';
+	
+	
+	std::cout << "=========================== sort test end ============================" << std::endl;
+
+	std::cout << "=========================== merge test start ============================" << std::endl;
+	
+	ft::list<double> list_merge_first, list_merge_second;
+
+	list_merge_first.push_back (3.1);
+	list_merge_first.push_back (2.2);
+	list_merge_first.push_back (2.9);
+
+	list_merge_second.push_back (3.7);
+	list_merge_second.push_back (7.1);
+	list_merge_second.push_back (1.4);
+
+	list_merge_first.sort();
+	list_merge_second.sort();
+
+	list_merge_first.merge(list_merge_second);
+
+  	// (second is now empty)
+
+	list_merge_second.push_back (2.1);
+
+	list_merge_first.merge(list_merge_second,mycomparison);
+
+  	std::cout << "first contains:";
+  	for (ft::list<double>::iterator it=list_merge_first.begin(); it!=list_merge_first.end(); ++it)
+    	std::cout << ' ' << *it;
+  	std::cout << '\n';
+
+	std::cout << list_merge_first.size() << std::endl;
+	std::cout << list_merge_second.size() << std::endl;
+	
+	std::cout << "=========================== merge test end ============================" << std::endl;
+
+
+	std::cout << "=========================== reverse test start ============================" << std::endl;
+  	ft::list<int> list_reverse;
+
+  	for (int i=1; i<10; ++i) list_reverse.push_back(i);
+
+  	list_reverse.reverse();
+
+  	std::cout << "mylist contains:";
+  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  		std::cout << ' ' << *it;
+	std::cout << '\n';
+
+	list_reverse.clear();
+  	std::cout << "mylist contains:";
+  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  		std::cout << ' ' << *it;
+	std::cout << '\n';
+
+	list_reverse.reverse();
+  	std::cout << "mylist contains:";
+  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  		std::cout << ' ' << *it;
+	std::cout << '\n';
+
+	list_reverse.push_back(55);
+	list_reverse.reverse();
+  	std::cout << "mylist contains:";
+  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  		std::cout << ' ' << *it;
+	std::cout << '\n';	
+
+	list_reverse.push_back(40);
+	list_reverse.reverse();
+  	std::cout << "mylist contains:";
+  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  		std::cout << ' ' << *it;
+	std::cout << '\n';		
+	std::cout << "=========================== reverse test end ==============================" << std::endl;
+
+	std::cout << "=========================== operator test start ==============================" << std::endl;
+
+	ft::list<int> a;
+	a.push_back(10);
+	a.push_back(20);
+	a.push_back(30);
+	ft::list<int> b;
+	b.push_back(10);
+	b.push_back(20);
+	b.push_back(30);
+	ft::list<int> c;
+	c.push_back(30);
+	c.push_back(20);
+	c.push_back(10);
+
+	if (a==b) std::cout << "a and b are equal\n";
+	if (b!=c) std::cout << "b and c are not equal\n";
+	if (b<c) std::cout << "b is less than c\n";
+	if (c>b) std::cout << "c is greater than b\n";
+	if (a<=b) std::cout << "a is less than or equal to b\n";
+	if (a>=b) std::cout << "a is greater than or equal to b\n";
+	std::cout << "=========================== operator test end ==============================" << std::endl;
+
+
+	return 0;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list_test.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 14:47:59 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/23 14:35:40 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/24 13:14:45 by honlee           ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,13 +201,17 @@ int		main()
 	
 	std::list<int> list;
 
-	list.push_back(2);
-	list.push_back(3);
-	list.push_back(4);
+	// list.push_back(-99999);
+	// list.push_back(2);
+	// list.push_back(4);
 
+	std::list<int> list2;
+	// list2.push_back(17);
+	// list2.push_back(3);
 
 	for(std::list<int>::iterator iter = list.begin(); iter != list.end(); iter++)
 		std::cout << *iter << " ";
 	std::cout << std::endl;
 
+	std::cout << (list < list2) << std::endl;
 }

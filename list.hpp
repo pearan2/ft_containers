@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 14:44:46 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/23 14:34:47 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/24 13:45:06 by honlee           ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -353,8 +353,14 @@ namespace ft
 				return (delete_prev);
 			}
 
-			//just add my linkedlist without create(alloc)
-			
+			void				changePrevNextAll(node<T>* head)
+			{
+				if (head != base)
+					changePrevNextAll(head->getNext());
+				node<T> *temp = head->getPrev();
+				head->setPrev(head->getNext());
+				head->setNext(temp);
+			}			
 
 		public :
 			//member types start
@@ -399,9 +405,10 @@ namespace ft
 			}
 
 			//range
-			template <class InputIterator, typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type>
-  			list (InputIterator first, InputIterator last, const Alloc& alloc = Alloc()) : base(NULL), number_of_node(0)
+			template <class InputIterator>
+  			list (InputIterator first, InputIterator last, const Alloc& alloc = Alloc(), typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type dummy = 0) : base(NULL), number_of_node(0)
 			{
+				dummy = 0;
 				(void)alloc;
 				Alnod _alloc;
 				base = _alloc.allocate(1);
@@ -428,6 +435,14 @@ namespace ft
 				retur (*this);
 			}
 
+			~list()
+			{
+				clear();
+				Alnod alloc;
+				
+				alloc.destroy(base);
+				alloc.deallocate(base, 1);
+			}
 			//////////////////////////////////////////////////////////////////
 			//						Constructor end							//
 			//////////////////////////////////////////////////////////////////
@@ -538,6 +553,7 @@ namespace ft
 			template <class InputIterator>
 			void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type dummy = 0)
 			{
+				dummy = 0;	
 				clear();
 				for (InputIterator iter = first; iter != last; iter++)
 					push_back(*iter);
@@ -570,6 +586,7 @@ namespace ft
 			template <class InputIterator>
     		void insert (iterator position, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type dummy = 0)
 			{
+				dummy = 0;
 				for (InputIterator iter = first; iter != last; iter++)
 					insert(position, *iter);
 			}
@@ -646,14 +663,237 @@ namespace ft
 
 			void remove (const value_type& val)
 			{
-				
+				node<T> *temp = base->getNext();
+				node<T> *temp_next;
+				while (temp != base)
+				{
+					temp_next = temp->getNext();
+					if (temp->getValue() == val)
+						deleteNode(temp);
+					temp = temp_next;
+				}
 			}
+
+			template <class Predicate>
+  			void remove_if (Predicate pred)
+			{
+				node<T> *temp = base->getNext();
+				node<T> *temp_next;
+				while (temp != base)
+				{
+					temp_next = temp->getNext();
+					if (pred(temp->getValue()))
+						deleteNode(temp);
+					temp = temp_next;
+				}
+			}
+
+			void unique()
+			{
+				node<T>* temp = base->getNext();
+				while (temp != base)
+				{
+					node<T>*temp2 = temp->getNext();
+					node<T>*temp2_next;
+					while (temp2 != base)
+					{
+						temp2_next = temp2->getNext();
+						if (temp->getValue() == temp2->getValue())
+							deleteNode(temp2);
+						temp2 = temp2_next;
+					}
+					temp = temp->getNext();
+				}
+			}
+
+			template <class BinaryPredicate>
+			void unique (BinaryPredicate binary_pred)
+			{
+				node<T>* temp = base->getNext();
+				while (temp != base)
+				{
+					node<T>*temp2 = temp->getNext();
+					node<T>*temp2_next;
+					while (temp2 != base)
+					{
+						temp2_next = temp2->getNext();
+						if (binary_pred(temp->getValue(), temp2->getValue()))
+							deleteNode(temp2);
+						temp2 = temp2_next;
+					}
+					temp = temp->getNext();
+				}
+			}
+
+			void merge (list& x)
+			{
+				node<T>* x_temp = x.base->getNext();
+				node<T>* x_temp_next;
+				while (x_temp != x.base)
+				{
+					bool is_in = false;
+
+					x_temp_next = x_temp->getNext();
+					node<T>* n_temp = this->base->getNext();
+					while (n_temp != this->base)
+					{
+						if (n_temp->getValue() > x_temp->getValue())
+						{
+							x.releaseNode(x_temp);
+							this->recruitNode(n_temp, x_temp);
+							is_in = true;
+							break ;
+						}
+						n_temp = n_temp->getNext();
+					}
+					if (is_in == false)
+					{
+						x.releaseNode(x_temp);
+						this->recruitNode(base, x_temp);
+					}
+					x_temp = x_temp_next;
+				}
+			}
+
+			template <class Compare>
+  			void merge (list& x, Compare comp)
+			{
+				node<T>* x_temp = x.base->getNext();
+				node<T>* x_temp_next;
+				while (x_temp != x.base)
+				{
+					bool is_in = false;
+
+					x_temp_next = x_temp->getNext();
+					node<T>* n_temp = this->base->getNext();
+					while (n_temp != this->base)
+					{
+						if ( comp(x_temp->getValue(), n_temp->getValue()) )
+						{
+							x.releaseNode(x_temp);
+							this->recruitNode(n_temp, x_temp);
+							is_in = true;
+							break ;
+						}
+						n_temp = n_temp->getNext();
+					}
+					if (is_in == false)
+					{
+						x.releaseNode(x_temp);
+						this->recruitNode(base, x_temp);
+					}
+					x_temp = x_temp_next;
+				}
+			}
+
+			void sort()
+			{
+				node<T>* temp = base->getNext();
+				while (temp->getNext() != base)
+				{
+					if (temp->getValue() > temp->getNext()->getValue())
+					{
+						T value_temp = temp->getValue();
+						temp->setValue(temp->getNext()->getValue());
+						temp->getNext()->setValue(value_temp);
+						temp = base->getNext();
+					}
+					else
+						temp = temp->getNext();
+				}
+			}
+
+			template <class Compare>
+  			void sort (Compare comp)
+			{
+				node<T>* temp = base->getNext();
+				while (temp->getNext() != base)
+				{
+					if (comp(temp->getValue(), temp->getNext()->getValue()))
+					{
+						T value_temp = temp->getValue();
+						temp->setValue(temp->getNext()->getValue());
+						temp->getNext()->setValue(value_temp);
+						temp = base->getNext();
+					}
+					else
+						temp = temp->getNext();
+				}
+			}
+
+			void reverse() { changePrevNextAll(base->getNext()); }
 			//////////////////////////////////////////////////////////////////
 			//						Operations end							//
 			//////////////////////////////////////////////////////////////////
 
 
 	};
+
+	template <class T, class Alloc>
+  	bool operator== (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{
+		if (!(lhs.size() == rhs.size()))
+			return (false);
+		if (lhs.size() == 0 && rhs.size() == 0)
+			return (true);
+		node<T> * lhs_node = lhs.base->getNext();
+		node<T> * rhs_node = rhs.base->getNext();
+		
+		while (lhs_node != lhs.base)
+		{
+			if (lhs_node->getValue() != rhs_node->getValue())
+				return (false);
+			lhs_node = lhs_node->getNext();
+			rhs_node = rhs_node->getNext();
+		}
+		return (true);
+	}
+
+	template <class T, class Alloc>
+	bool operator!= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{
+		return (!(lhs==rhs));
+	}
+
+	template <class T, class Alloc>
+  	bool operator<  (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{
+		node<T> * lhs_node = lhs.base->getNext();
+		node<T> * rhs_node = rhs.base->getNext();
+		while (lhs_node != lhs.base)
+		{
+			if (rhs_node == rhs.base)
+				return (false);
+			if (lhs_node->getValue() < rhs_node->getValue())
+				return (true);
+			else if (lhs_node->getValue() > rhs_node->getValue())
+				return (false);
+			else
+			{
+				lhs_node = lhs_node->getNext();
+				rhs_node = rhs_node->getNext();
+			}
+		}
+		return (true);
+	}
+
+	template <class T, class Alloc>
+	bool operator<= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{
+		return ((lhs == rhs) || (lhs < rhs));
+	}
+
+	template <class T, class Alloc>
+	bool operator> (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{
+		return (!(lhs <= rhs));
+	}
+
+	template <class T, class Alloc>
+	bool operator>= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
+	{
+		return ((lhs == rhs) || (lhs > rhs));
+	}
 }
 
 #endif
