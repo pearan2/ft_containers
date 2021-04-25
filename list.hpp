@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 14:44:46 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/24 13:45:06 by honlee           ###   ########seoul.kr  */
+/*   Updated: 2021/04/25 11:00:54 by honlee           ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <iostream>
 #include "template_util.hpp"
+#include "utils.hpp"
 #include <limits>
 
 namespace ft
@@ -458,7 +459,8 @@ namespace ft
 
 			const_iterator begin() const
 			{
-				return (iterator(base->getNext()));
+				typedef node<const T> const_node;
+				return const_iterator(reinterpret_cast<const_node *>(base->getNext()));
 			}
 
 			iterator end()
@@ -468,7 +470,8 @@ namespace ft
 
 			const_iterator end() const
 			{
-				return (iterator(base));
+				typedef node<const T> const_node;
+				return const_iterator(reinterpret_cast<const_node *>(base));
 			}
 
 			reverse_iterator rbegin()
@@ -478,7 +481,8 @@ namespace ft
 
 			const_reverse_iterator rbegin() const
 			{
-				return (reverse_iterator(base->getPrev()));
+				typedef node<const T> const_node;
+				return reverse_iterator(reinterpret_cast<const_node *>(base->getPrev()));
 			}
 
 			reverse_iterator rend()
@@ -488,7 +492,8 @@ namespace ft
 
 			const_reverse_iterator rend() const
 			{
-				return (reverse_iterator(base));
+				typedef node<const T> const_node;
+				return reverse_iterator(reinterpret_cast<const_node *>(base));
 			}
 			//////////////////////////////////////////////////////////////////
 			//						Iterators end							//
@@ -511,7 +516,8 @@ namespace ft
 
 			size_type max_size() const
 			{
-				return (std::numeric_limits<difference_type>::max());
+				return (Alnod().max_size());
+				//return (std::numeric_limits<difference_type>::max());
 			}
 
 			//////////////////////////////////////////////////////////////////
@@ -832,21 +838,9 @@ namespace ft
 	template <class T, class Alloc>
   	bool operator== (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 	{
-		if (!(lhs.size() == rhs.size()))
-			return (false);
-		if (lhs.size() == 0 && rhs.size() == 0)
-			return (true);
-		node<T> * lhs_node = lhs.base->getNext();
-		node<T> * rhs_node = rhs.base->getNext();
-		
-		while (lhs_node != lhs.base)
-		{
-			if (lhs_node->getValue() != rhs_node->getValue())
-				return (false);
-			lhs_node = lhs_node->getNext();
-			rhs_node = rhs_node->getNext();
-		}
-		return (true);
+		if (lhs.size() != rhs.size())
+			return false;
+		return equal(lhs.begin(), lhs.end(), rhs.begin());
 	}
 
 	template <class T, class Alloc>
@@ -858,23 +852,7 @@ namespace ft
 	template <class T, class Alloc>
   	bool operator<  (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 	{
-		node<T> * lhs_node = lhs.base->getNext();
-		node<T> * rhs_node = rhs.base->getNext();
-		while (lhs_node != lhs.base)
-		{
-			if (rhs_node == rhs.base)
-				return (false);
-			if (lhs_node->getValue() < rhs_node->getValue())
-				return (true);
-			else if (lhs_node->getValue() > rhs_node->getValue())
-				return (false);
-			else
-			{
-				lhs_node = lhs_node->getNext();
-				rhs_node = rhs_node->getNext();
-			}
-		}
-		return (true);
+		return lexicographical_less(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 	}
 
 	template <class T, class Alloc>
@@ -893,6 +871,12 @@ namespace ft
 	bool operator>= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 	{
 		return ((lhs == rhs) || (lhs > rhs));
+	}
+
+	template <class T, class Alloc>
+	void swap (list<T,Alloc>& x,list<T,Alloc>& y)
+	{
+		x.swap(y);
 	}
 }
 
