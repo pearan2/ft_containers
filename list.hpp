@@ -3,289 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 14:44:46 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/25 11:00:54 by honlee           ###   ########seoul.kr  */
+/*   Updated: 2021/04/26 22:04:12 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef list_HPP
-# define list_HPP
+#ifndef LIST_HPP
+# define LIST_HPP
 
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <limits>
 #include "template_util.hpp"
 #include "utils.hpp"
-#include <limits>
+#include "list_iterator.hpp"
 
 namespace ft
 {
-	template <typename T>
-	class node
-	{
-		private :
-			node*	prev;
-			node*	next;
-			T		value;
-
-		public	:
-			//canonical form start
-			node() : prev(NULL), next(NULL)
-			{
-				
-			}
-			node(node* prev, node* next) : prev(prev), next(next)
-			{
-
-			}
-			node(node* prev, node* next, const T& value) : prev(prev), next(next), value(value)
-			{
-				
-			}
-			node(node const &origin) : prev(origin.prev), next(origin.next), value(origin.value)
-			{
-				
-			}
-			node &operator=(node const &origin)
-			{
-				this->prev = origin.prev;
-				this->next = origin.next;
-				this->valu = origin.value;
-				return (*this);
-			}
-			~node()
-			{
-				//std::cout << " Noooooo ! value " << this->value << "  node detroyed :(" << std::endl;
-			}
-			//canonical form end
-
-			//getter
-			node*	getPrev(void)
-			{
-				return (this->prev);
-			}
-
-			node*	getNext(void)
-			{
-				return (this->next);
-			}
-
-			const T&getValue(void) const
-			{
-				return (this->value);
-			}
-
-			T&		getValue(void)
-			{
-				return (this->value);
-			}
-
-			//setter
-			void	setNext(node *next)
-			{
-				this->next = next;
-			}
-			void	setPrev(node *prev)
-			{
-				this->prev = prev;
-			}
-			void	setValue(const T& value)
-			{
-				this->value = value;
-			}
-
-			//new with value
-			node*	clone_with_value(void)
-			{
-				return (new node(NULL, NULL, this->value));
-			}
-	};
-
-	template <typename T>
-	class listIterator
-	{
-		private	:
-			node<T> *now;
-		public	:
-			listIterator(node<T> *now = NULL) : now(now)
-			{
-				
-			}
-
-			listIterator(const listIterator& origin) : now(origin.now)
-			{
-				
-			}
-
-			listIterator& operator=(const listIterator& origin)
-			{
-				this->now = origin.now;
-				return (*this);
-			}
-
-			~listIterator()
-			{
-				
-			}
-
-			//*
-			T& operator*() const
-			{
-				return (now->getValue());
-			}
-
-			//++ (전위)
-			listIterator& operator++()
-			{
-				//미리 이동시키고 보낸다.
-				this->now = this->now->getNext();
-				return (*this);
-			}
-
-			//++ (후위)
-			//warning: reference to stack memory associated with local variable 'temp' returned [-Wreturn-stack-address
-			//위는 레퍼런스를 보낼경우, 즉. temp 는 스택에 생성되기 떄문에 스택에서 생성된 변수의 레퍼런스를 보낼경우
-			//워닝이 뜬다.
-			listIterator operator++(int)
-			{
-				//리턴하고 이동시킨다.
-				listIterator temp(*this);
-				now = now->getNext();
-				return (temp);
-			}
-
-			//-- (전위)
-			listIterator& operator--()
-			{
-				//미리 이동시키고 리턴.
-				this->now = this->now->getPrev();
-				return (*this);
-			}
-
-			//-- (후위)
-			listIterator operator--(int)
-			{
-				//리턴후 이동
-				listIterator temp(*this);
-				now = now->getPrev();
-				return (temp);
-			}
-
-			//->
-			T*			  operator->() const
-			{
-				return &(operator*());
-			}
-
-			bool		  operator==(const listIterator &origin) const
-			{
-				return (now == origin.now);
-			}
-
-			bool		  operator!=(const listIterator &origin) const
-			{
-				return (!operator==(origin));
-			}
-
-			//getter
-			node<T>*		getnode(void)
-			{
-				return (this->now);
-			}
-	};
-
-	template <typename T>
-	class listReverseIterator
-	{
-		private	:
-			node<T> *now;
-		public	:
-			listReverseIterator(node<T> *now = NULL) : now(now)
-			{
-				
-			}
-
-			listReverseIterator(const listReverseIterator& origin) : now(origin.now)
-			{
-				
-			}
-
-			listReverseIterator& operator=(const listReverseIterator& origin)
-			{
-				this->now = origin.now;
-				return (*this);
-			}
-
-			~listReverseIterator()
-			{
-				
-			}
-
-			//*
-			T& operator*() const
-			{
-				return (now->getValue());
-			}			
-
-			//++ (전위)
-			listReverseIterator& operator++()
-			{
-				this->now = this->now->getPrev();
-				return (*this);
-			}
-
-			//++ (후위)
-			listReverseIterator operator++(int)
-			{
-				//리턴하고 이동시킨다.
-				listReverseIterator temp(*this);
-				now = now->getPrev();
-				return (temp);
-			}
-
-			//-- (전위)
-			listReverseIterator& operator--()
-			{
-				//미리 이동시키고 리턴.
-				this->now = this->now->getNext();
-				return (*this);
-			}
-
-			//-- (후위)
-			listReverseIterator operator--(int)
-			{
-				//리턴후 이동
-				listReverseIterator temp(*this);
-				now = now->getNext();
-				return (temp);
-			}
-
-			//->
-			T*			  operator->() const
-			{
-				return &(operator*());
-			}
-
-			bool		  operator==(const listReverseIterator &origin) const
-			{
-				return (now == origin.now);
-			}
-
-			bool		  operator!=(const listReverseIterator &origin) const
-			{
-				return (!operator==(origin));
-			}
-
-			//getter
-			node<T>*		getnode(void)
-			{
-				return (this->now);
-			}
-	};
-
-
 	template <class T, class Alloc = std::allocator<T> >
 	class list
 	{
@@ -308,7 +45,7 @@ namespace ft
 				new_node->setPrev(pos_prev);
 				new_node->setNext(pos);
 				number_of_node++;
-				return (pos);
+				return (new_node);
 			}
 
 			//destroy node and dealloc mem by alloc
@@ -327,7 +64,7 @@ namespace ft
 				delete_prev->setNext(delete_next);
 				delete_next->setPrev(delete_prev);
 				number_of_node--;
-				return (delete_prev);
+				return (delete_next);
 			}
 
 			//add target node without create node
@@ -339,7 +76,7 @@ namespace ft
 				target->setPrev(pos_prev);
 				target->setNext(pos);
 				number_of_node++;
-				return (pos);
+				return (target);
 			}
 
 			//delete target node without destroy, dealloc
@@ -351,7 +88,7 @@ namespace ft
 				delete_prev->setNext(delete_next);
 				delete_next->setPrev(delete_prev);
 				number_of_node--;
-				return (delete_prev);
+				return (delete_next);
 			}
 
 			void				changePrevNextAll(node<T>* head)
@@ -371,9 +108,9 @@ namespace ft
 			typedef T *pointer;
 			typedef const T *const_pointer;
 			typedef listIterator<T> iterator;
-			typedef listIterator<const T> const_iterator;
+			typedef listConstIterator<T> const_iterator;
 			typedef listReverseIterator<T> reverse_iterator;
-			typedef listReverseIterator<const T> const_reverse_iterator;
+			typedef listReverseConstIterator<T> const_reverse_iterator;
 			typedef std::ptrdiff_t difference_type;
 			typedef size_t size_type;
 			//rebind
@@ -422,8 +159,10 @@ namespace ft
 			//copy
 			list (const list& origin) : base(NULL), number_of_node(0)
 			{
-				clear();
-				for (iterator iter = origin.begin(); iter != origin.end(); iter++)
+				Alnod _alloc;
+				base = _alloc.allocate(1);
+				_alloc.construct(base, node<T>(base, base));
+				for (const_iterator iter = origin.begin(); iter != origin.end(); iter++)
 					push_back(*iter);
 			}
 
@@ -431,9 +170,9 @@ namespace ft
 			list& operator=(const list& origin)
 			{
 				clear();
-				for (iterator iter = origin.begin(); iter != origin.end(); iter++)
+				for (const_iterator iter = origin.begin(); iter != origin.end(); iter++)
 					push_back(*iter);
-				retur (*this);
+				return (*this);
 			}
 
 			~list()
@@ -459,8 +198,7 @@ namespace ft
 
 			const_iterator begin() const
 			{
-				typedef node<const T> const_node;
-				return const_iterator(reinterpret_cast<const_node *>(base->getNext()));
+				return (const_iterator(base->getNext()));
 			}
 
 			iterator end()
@@ -470,8 +208,7 @@ namespace ft
 
 			const_iterator end() const
 			{
-				typedef node<const T> const_node;
-				return const_iterator(reinterpret_cast<const_node *>(base));
+				return (const_iterator(base));
 			}
 
 			reverse_iterator rbegin()
@@ -481,8 +218,7 @@ namespace ft
 
 			const_reverse_iterator rbegin() const
 			{
-				typedef node<const T> const_node;
-				return reverse_iterator(reinterpret_cast<const_node *>(base->getPrev()));
+				return (const_reverse_iterator(base->getPrev()));
 			}
 
 			reverse_iterator rend()
@@ -492,8 +228,7 @@ namespace ft
 
 			const_reverse_iterator rend() const
 			{
-				typedef node<const T> const_node;
-				return reverse_iterator(reinterpret_cast<const_node *>(base));
+				return (const_reverse_iterator(base));
 			}
 			//////////////////////////////////////////////////////////////////
 			//						Iterators end							//
@@ -517,7 +252,6 @@ namespace ft
 			size_type max_size() const
 			{
 				return (Alnod().max_size());
-				//return (std::numeric_limits<difference_type>::max());
 			}
 
 			//////////////////////////////////////////////////////////////////
@@ -580,8 +314,9 @@ namespace ft
 
 			void pop_back()	{ deleteNode(base->getPrev()); }
 
-			//자기 앞에 넣음. 리턴은 자기자신
+			//자기 앞에 넣음. 리턴은 새로 만들어져서 들어간 놈의 이터레이터
 			iterator insert (iterator position, const value_type& val) { return (iterator(addBeforeNode(position.getnode(), val))); }
+
 
 			void insert (iterator position, size_type n, const value_type& val)
 			{
@@ -611,6 +346,10 @@ namespace ft
 				node<T> *temp = x.base;
 				x.base = this->base;
 				this->base = temp;
+
+				unsigned int size_temp = x.number_of_node;
+				x.number_of_node = this->number_of_node;
+				this->number_of_node = size_temp;
 			}
 
 			void resize (size_type n, value_type val = value_type())
@@ -735,12 +474,13 @@ namespace ft
 			{
 				node<T>* x_temp = x.base->getNext();
 				node<T>* x_temp_next;
+				node<T>* n_start = this->base->getNext();
 				while (x_temp != x.base)
 				{
 					bool is_in = false;
 
 					x_temp_next = x_temp->getNext();
-					node<T>* n_temp = this->base->getNext();
+					node<T>* n_temp = n_start;
 					while (n_temp != this->base)
 					{
 						if (n_temp->getValue() > x_temp->getValue())
@@ -748,6 +488,7 @@ namespace ft
 							x.releaseNode(x_temp);
 							this->recruitNode(n_temp, x_temp);
 							is_in = true;
+							n_start = x_temp->getNext();
 							break ;
 						}
 						n_temp = n_temp->getNext();
@@ -766,12 +507,13 @@ namespace ft
 			{
 				node<T>* x_temp = x.base->getNext();
 				node<T>* x_temp_next;
+				node<T>* n_start = this->base->getNext();
 				while (x_temp != x.base)
 				{
 					bool is_in = false;
 
 					x_temp_next = x_temp->getNext();
-					node<T>* n_temp = this->base->getNext();
+					node<T>* n_temp = n_start;
 					while (n_temp != this->base)
 					{
 						if ( comp(x_temp->getValue(), n_temp->getValue()) )
@@ -779,6 +521,7 @@ namespace ft
 							x.releaseNode(x_temp);
 							this->recruitNode(n_temp, x_temp);
 							is_in = true;
+							n_start = x_temp->getNext();
 							break ;
 						}
 						n_temp = n_temp->getNext();
@@ -815,7 +558,7 @@ namespace ft
 				node<T>* temp = base->getNext();
 				while (temp->getNext() != base)
 				{
-					if (comp(temp->getValue(), temp->getNext()->getValue()))
+					if (!comp(temp->getValue(), temp->getNext()->getValue()))
 					{
 						T value_temp = temp->getValue();
 						temp->setValue(temp->getNext()->getValue());

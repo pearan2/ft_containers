@@ -3,15 +3,15 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+         #
+#    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/24 11:21:39 by honlee           ###   ########seoul.kr   #
+#    Updated: 2021/04/26 23:00:14 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS		=		\
-					list_main.cpp\
+					vector_main.cpp\
 
 NAME		=		a.out
 
@@ -21,7 +21,7 @@ CF			=		-Wall -Wextra -Werror -std=c++98 ${SRCS}
 DCF			=		-g ${SRCS}
 
 ${NAME}     :       
-					${CC} ${CF} -o ${NAME}
+					${CC} ${DCF} -o ${NAME}
 
 test		:		fclean
 					${CC} ${DCF} -o ${NAME}

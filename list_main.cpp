@@ -3,16 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   list_main.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 18:56:50 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/24 13:27:06 by honlee           ###   ########seoul.kr  */
+/*   Updated: 2021/04/26 21:05:49 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "list.hpp"
 #include <vector>
 #include <iterator>
+#include <string>
+#include <iostream>
+
+#define TESTED_NAMESPACE ft
+#define TESTED_TYPE int
 
 class test
 {
@@ -33,6 +38,37 @@ class test
 			//std::cout << "test class deleted :(" << std::endl;
 		}
 };
+
+
+template <typename T>
+void	printSize(TESTED_NAMESPACE::list<T> const &lst, bool print_content = 1)
+{
+	std::cout << "size: " << lst.size() << std::endl;
+	std::cout << "max_size: " << lst.max_size() << std::endl;
+	if (print_content)
+	{
+		typename TESTED_NAMESPACE::list<T>::const_iterator it = lst.begin(), ite = lst.end();
+		std::cout << std::endl << "Content is:" << std::endl;
+		for (; it != ite; ++it)
+			std::cout << "- " << *it << std::endl;
+	}
+	std::cout << "###############################################" << std::endl;
+}
+
+void	checkErase(TESTED_NAMESPACE::list<TESTED_TYPE> const &lst,
+					TESTED_NAMESPACE::list<TESTED_TYPE>::const_iterator const &it)
+{
+	static int i = 0;
+
+	int j = 0;
+	TESTED_NAMESPACE::list<TESTED_TYPE>::const_iterator ite = lst.begin();
+	while (it != ite--)
+		++j;
+
+	std::cout << "[" << i++ << "] " << "erase: " << j << std::endl;
+	printSize(lst);
+}
+
 
 bool single_digit (const int& value) { return (value<10); }
 
@@ -431,27 +467,8 @@ int			main()
 
 	std::cout << "=========================== operator test start ==============================" << std::endl;
 
-	ft::list<int> a;
-	a.push_back(10);
-	a.push_back(20);
-	a.push_back(30);
-	ft::list<int> b;
-	b.push_back(10);
-	b.push_back(20);
-	b.push_back(30);
-	ft::list<int> c;
-	c.push_back(30);
-	c.push_back(20);
-	c.push_back(10);
 
-	if (a==b) std::cout << "a and b are equal\n";
-	if (b!=c) std::cout << "b and c are not equal\n";
-	if (b<c) std::cout << "b is less than c\n";
-	if (c>b) std::cout << "c is greater than b\n";
-	if (a<=b) std::cout << "a is less than or equal to b\n";
-	if (a>=b) std::cout << "a is greater than or equal to b\n";
-	std::cout << "=========================== operator test end ==============================" << std::endl;
+	
 
-
-	return 0;
+	return (0);
 }
