@@ -6,7 +6,7 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/26 23:00:14 by honlee           ###   ########.fr        #
+#    Updated: 2021/04/27 15:44:23 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,15 +21,30 @@ CF			=		-Wall -Wextra -Werror -std=c++98 ${SRCS}
 DCF			=		-g ${SRCS}
 
 ${NAME}     :       
-					${CC} ${DCF} -o ${NAME}
+					${CC} ${CF} -o ${NAME}
 
-test		:		fclean
+dbg			:		fclean
 					${CC} ${DCF} -o ${NAME}
 					lldb a.out
+
+test		:		fclean
+					${CC} ${DCF} -o ${NAME} -D TEST_NS=ft
+					./a.out > ft_out.txt
+					${CC} ${DCF} -o ${NAME} -D TEST_NS=std
+					./a.out > std_out.txt
+					diff ft_out.txt std_out.txt > diff.txt
+					@echo "===================== diff.txt ====================="
+					@cat diff.txt
+					@echo "=================== diff.txt end ==================="
+					rm -rf a.out
+					rm -rf a.out.dSYM
 
 fclean		:		
 					rm -f ${NAME}
 					rm -rf a.out.dSYM
+					rm -rf ft_out.txt
+					rm -rf std_out.txt
+					rm -rf diff.txt
 
 re			:		fclean all
 

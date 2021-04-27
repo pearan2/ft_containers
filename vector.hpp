@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/26 21:14:24 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/26 23:03:52 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/27 17:21:59 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <iostream>
 #include <limits>
+#include <string>
 
 #include "template_util.hpp"
 #include "utils.hpp"
@@ -32,15 +33,26 @@ namespace ft
 			size_t	noe;
 			size_t	cap; 
 
+			unsigned int	getIdxFromPtr(T* target)
+			{
+				return (target - arr);
+			}
+
 			void	expand(unsigned int to_size)
 			{
+				if (noe >= to_size)
+					return ;
+
 				Alloc alloc;
 
 				T* temp = alloc.allocate(to_size);
-				for (size_t i = 0; i < noe; i++)
-					alloc.construct(temp + i, *(arr + i));
-				alloc.destroy(arr);
-				alloc.deallocate(arr, noe);
+				if (noe > 0)
+				{
+					for (size_t i = 0; i < noe; i++)
+						alloc.construct(temp + i, *(arr + i));	
+					alloc.destroy(arr);
+					alloc.deallocate(arr, noe);
+				}
 				cap = to_size;
 				arr = temp;
 			}
@@ -53,14 +65,32 @@ namespace ft
 
 			void	shift(T* pos, unsigned int shift_size)
 			{
-				expand( (noe + shift_size) * 2);
-				for (T* ptr = pos + shift_size; ; ptr--)
-				{
-					setValue(ptr, *(ptr - shift_size));
-					if (ptr == pos)
-						return ;
-				}
+				Alloc alloc;
+				unsigned int idx = getIdxFromPtr(pos);
+
+				if (shift_size + noe >= cap)
+					expand( (noe + shift_size) * 2 );
+				for (unsigned int i = 0; i < noe - idx; i++)
+					setValue(arr + noe - 1 + shift_size - i, *(arr + noe - 1 - i));
 			}
+
+			void	shift_back(T* pos, unsigned int shift_size)
+			{
+				unsigned int idx = getIdxFromPtr(pos);
+
+				for (unsigned int i = idx; i < noe - shift_size; i++)
+					setValue(arr + i, *(arr + i + shift_size));
+				noe -= shift_size;
+			}
+
+			class OutOfRangeException : public std::exception
+			{
+				virtual const char * what() const throw()
+				{
+					return "Index is out of range";
+				}
+			};
+
 		public	:
 			typedef Alloc allocator_type;
 			typedef T value_type;
@@ -71,7 +101,7 @@ namespace ft
 			typedef T *pointer;
 			typedef const T *const_pointer;
 			typedef vectorIterator<T> iterator;
-			typedef vectorIterator<const T> const_iterator;
+			typedef vectorConstIterator<T> const_iterator;
 			// typedef ReverseIterator<iterator> reverse_iterator;
 			// typedef ReverseIterator<const_iterator> const_reverse_iterator;
 
@@ -82,29 +112,46 @@ namespace ft
 			// default constructor
 			explicit vector (const allocator_type& alloc = allocator_type()) : arr(NULL), noe(0), cap(0)
 			{
+				(void)alloc;
 				expand(42);
 			}
 			// fill constructor
 			explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : arr(NULL), noe(0), cap(0)
 			{
-				std::cout << "fill constructor called" << std::endl;
+				(void)alloc;
+				expand(42);
+				for (size_type i = 0; i < n; i++)
+					push_back(val);
 			}
 			// range constructor
 			template <class InputIterator>
          	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type dummy = 0) : arr(NULL), noe(0), cap(0)
 			{
-				std::cout << "range constructor called" << std::endl;
+				(void)alloc;
+				dummy = 0;
+				expand(42);
+				for (InputIterator iter = first; iter != last; iter++)
+					push_back(*iter);
 			}
 			// copy constructor
-			vector (const vector& x)
+			vector (const vector& x) : arr(NULL), noe(0), cap(0)
 			{
-				std::cout << "copy constructor called" << std::endl;
+				expand(42);
+				insert(begin(), x.begin(), x.end());
+			}
+
+			vector<T>& operator= (const vector& x)
+			{
+				clear();
+				insert(begin(), x.begin(), x.end());
+				return (*this);
 			}
 
 			~vector()
 			{
 				Alloc alloc;
 
+				//std::cout << size() << std::endl;
 				alloc.destroy(arr);
 				alloc.deallocate(arr, cap);
 			}
@@ -156,14 +203,24 @@ namespace ft
 				return (Alloc().max_size());
 			}
 
+			void resize (size_type n, value_type val = value_type())
+			{
+				unsigned int numOfEle = this->noe;
+				if (numOfEle < n)
+				{
+					for (unsigned int i = 0; i < n - numOfEle; i++)
+						push_back(val);
+				}
+				else
+				{
+					for (unsigned int i = 0; i < numOfEle - n; i++)
+						pop_back();
+				}
+			}
+
 			size_type capacity() const
 			{
 				return (this->cap);
-			}
-
-			void resize (size_type n, value_type val = value_type())
-			{
-				//resize
 			}
 
 			bool empty() const
@@ -171,27 +228,190 @@ namespace ft
 				return (noe == 0);
 			}
 
+			void reserve (size_type n)
+			{
+				if (n > noe)
+					expand(n);
+			}
 			
 			//////////////////////////////////////////////////////////////////
 			//						capacity end							//
 			//////////////////////////////////////////////////////////////////
 	
+
+			//////////////////////////////////////////////////////////////////
+			//						element start							//
+			//////////////////////////////////////////////////////////////////
+
+			reference operator[] (size_type n)
+			{
+				return (at(n));
+			}
+
+			const_reference operator[] (size_type n) const
+			{
+				return (at(n));
+			}
+
+			reference at (size_type n)
+			{
+				if (n < noe)
+					return (arr[n]);
+				else
+					throw OutOfRangeException();
+			}
+
+			const_reference at (size_type n) const
+			{
+				if (n < noe)
+					return (arr[n]);
+				else
+					throw OutOfRangeException();
+			}
+
+			reference front()
+			{
+				return (at(0));
+			}
+
+			const_reference front() const
+			{
+				return (at(0));
+			}
+
+			reference back()
+			{
+				return (at(noe - 1));
+			}
+
+			const_reference back() const
+			{
+				return (at(noe - 1));
+			}
+
+			//////////////////////////////////////////////////////////////////
+			//						element end								//
+			//////////////////////////////////////////////////////////////////
+
+
+
 			//////////////////////////////////////////////////////////////////
 			//						modifiers start							//
 			//////////////////////////////////////////////////////////////////
 			
-			iterator insert (iterator position, const value_type& val)
+			template <class InputIterator>
+  			void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type dummy = 0)
 			{
-				T* pos_ptr = position.getPtr();
-				shift(pos_ptr, 1);
-				*pos_ptr = val;
-				noe++;
-				return (pos_ptr);
+				dummy = 0;
+				clear();
+				unsigned int i = 0;
+				for (InputIterator iter = first; iter != last; iter++)
+				{
+					setValue(arr + i, *iter);
+					i++;
+				}
+				noe += i;
+			}
+
+			void assign (size_type n, const value_type& val)
+			{
+				clear();
+				for (size_type i = 0; i < n; i++)
+					setValue(arr + i, val);
+				noe += n;
 			}
 
 			void push_back (const value_type& val)
 			{
+				if (noe >= cap)
+					expand(cap * 2);
+				setValue(arr + noe, val);
+				noe++;
+			}
+
+			void pop_back()
+			{
+				if (noe > 0)
+					noe--;
+			}
+
+			iterator insert (iterator position, const value_type& val)
+			{
+				T* pos_ptr = position.getPtr();
+				shift(pos_ptr, 1);
+				setValue(pos_ptr, val);
+				noe++;
+				return (pos_ptr);
+			}
+
+			void insert (iterator position, size_type n, const value_type& val)
+			{
+				T* pos_ptr = position.getPtr();
+				shift(pos_ptr, n);
+				for (unsigned int i = 0; i < n; i++)
+					setValue(pos_ptr + i, val);
+				noe += n;
+			}
+
+			template <class InputIterator>
+    		void insert (iterator position, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type dummy = 0)
+			{
+				dummy = 0;
+				unsigned int len = 0;
+				T* pos_ptr = position.getPtr();
 				
+				for (InputIterator iter = first; iter != last; iter++)
+					len++;
+
+				shift(pos_ptr, len);
+				
+				unsigned int i = 0;
+				for (InputIterator iter = first; iter != last; iter++)
+				{
+					setValue(pos_ptr + i, *iter);
+					i++;
+				}
+				noe += len;
+			}
+
+			iterator erase (iterator position)
+			{
+				unsigned int idx = getIdxFromPtr(position.getPtr());
+
+				shift_back(position.getPtr(), 1);
+				return (iterator(arr + idx));
+				
+			}
+
+			iterator erase (iterator first, iterator last)
+			{
+				unsigned int idx = getIdxFromPtr(first.getPtr());
+
+				unsigned int i = 0;
+				for (iterator iter = first; iter != last; iter++)
+					i++;
+				shift_back(first.getPtr(), i);
+				return (iterator(arr + idx));
+			}
+
+			void swap (vector& x)
+			{
+				T* temp = this->arr;
+				this->arr = x.arr;
+				x.arr = temp;
+
+				unsigned int temp_noe = this->noe;
+				this->noe = x.noe;
+				x.noe = temp_noe;
+				
+				unsigned int temp_cap = this->cap;
+				this->cap = x.cap;
+				x.cap = temp_cap;
+			}
+
+			void clear()
+			{
+				noe = 0;
 			}
 
 			//////////////////////////////////////////////////////////////////
