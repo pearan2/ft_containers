@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/26 21:14:24 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/27 17:21:59 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/27 21:11:00 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,8 @@ namespace ft
 			typedef const T *const_pointer;
 			typedef vectorIterator<T> iterator;
 			typedef vectorConstIterator<T> const_iterator;
-			// typedef ReverseIterator<iterator> reverse_iterator;
-			// typedef ReverseIterator<const_iterator> const_reverse_iterator;
+			typedef vectorReverseIterator<T> reverse_iterator;
+			typedef vectorReverseConstIterator<T> const_reverse_iterator;
 
 
 			//////////////////////////////////////////////////////////////////
@@ -168,11 +168,9 @@ namespace ft
 				return (iterator(arr));
 			}
 
-			// 이 클레스의 인스턴스가 const 라면, 이 메소드가 호출될 것이고
-			// 그렇다면 arr 또한 const 일 것이다. 그렇다면 vectorIterator<const T> 이므로 const_iterator 로 캐스팅된다.
 			const_iterator begin() const 
 			{
-				return (iterator(arr));
+				return (const_iterator(arr));
 			}
 
 			iterator end()
@@ -182,7 +180,27 @@ namespace ft
 
 			const_iterator end() const
 			{
-				return (iterator(arr +noe));
+				return (const_iterator(arr +noe));
+			}
+
+			reverse_iterator rbegin()
+			{
+				return (reverse_iterator(arr + noe - 1));
+			}
+
+			const_reverse_iterator rbegin() const
+			{
+				return (const_reverse_iterator(arr + noe - 1));
+			}
+
+			reverse_iterator rend()
+			{
+				return (reverse_iterator(arr - 1));
+			}
+
+			const_reverse_iterator rend() const
+			{
+				return (const_reverse_iterator(arr - 1));
 			}
 
 			//////////////////////////////////////////////////////////////////
@@ -419,6 +437,50 @@ namespace ft
 			//////////////////////////////////////////////////////////////////
 		
 	};
+
+	template <class T, class Alloc>
+  	bool operator== (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return false;
+		return equal(lhs.begin(), lhs.end(), rhs.begin());
+	}
+
+	template <class T, class Alloc>
+	bool operator!= (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return (!(lhs==rhs));
+	}
+
+	template <class T, class Alloc>
+  	bool operator<  (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return lexicographical_less(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	}
+
+	template <class T, class Alloc>
+	bool operator<= (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return ((lhs == rhs) || (lhs < rhs));
+	}
+
+	template <class T, class Alloc>
+	bool operator> (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return (!(lhs <= rhs));
+	}
+
+	template <class T, class Alloc>
+	bool operator>= (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return ((lhs == rhs) || (lhs > rhs));
+	}
+
+	template <class T, class Alloc>
+	void swap (vector<T, Alloc>& x,vector<T, Alloc>& y)
+	{
+		x.swap(y);
+	}
 }
 
 #endif
