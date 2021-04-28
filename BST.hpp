@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 11:07:41 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/28 14:03:42 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/28 05:19:10 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <iostream>
 # include <string>
+# include "utils.hpp"
 namespace ft
 {
 	template <typename TK, typename TV>
@@ -47,13 +48,14 @@ namespace ft
 			}
 	};
 
-	template <typename TK, typename TV>
+	template <typename TK, typename TV, class Compare = ft::less<TK> >
 	class node
 	{
 		private :
 			node*	parent;
 			node*	left;
 			node*	right;
+			Compare cmp;
 
 			node(){}
 			node<TK, TV>& operator=(const node<TK, TV>& origin)
@@ -104,13 +106,13 @@ namespace ft
 			{
 				node<TK, TV>* child;
 
-				if (root->first == tk)
+				if ((cmp(root->first, tk) == false) && (cmp(tk, root->first) == false))
 				{
 					root->second = tv;
 					return (root);
 				}
 				
-				if (root->first < tk) // 오른쪽으로 가야한다.
+				if ( cmp(root->first, tk) ) // 오른쪽으로 가야한다.
 				{
 					if (root->right == NULL) // 오른쪽이 비어있다면 넣는다.
 					{
@@ -153,7 +155,7 @@ namespace ft
 			{
 				node<TK, TV> *newRoot;
 
-				if (root->first == tk)
+				if ((cmp(root->first, tk) == false) && (cmp(tk, root->first) == false))
 				{
 					if (root->left != NULL)
 					{
@@ -196,9 +198,9 @@ namespace ft
 					}
 					return ;
 				}
-				if (root->first > tk)
+				if (cmp(root->first, tk) == false)
 					deleteNode(real_root, root->left, tk);
-				else if (root->first < tk)
+				else if (cmp(root->first, tk))
 					deleteNode(real_root, root->right, tk);
 			}
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/25 10:11:09 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/25 10:18:43 by honlee           ###   ########seoul.kr  */
+/*   Updated: 2021/04/28 04:21:21 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,15 @@
 
 namespace ft
 {
+	template <typename T>
+	struct less
+	{
+		bool operator()(const T &lhs, const T &rhs) const
+		{
+			return lhs < rhs;
+		}
+	};
+
 	template <typename InputIt1, typename InputIt2>
 	bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2)
 	{
