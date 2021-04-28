@@ -6,12 +6,12 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/27 15:44:23 by honlee           ###   ########.fr        #
+#    Updated: 2021/04/28 12:01:00 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS		=		\
-					vector_main.cpp\
+					map_main.cpp\
 
 NAME		=		a.out
 
@@ -21,7 +21,7 @@ CF			=		-Wall -Wextra -Werror -std=c++98 ${SRCS}
 DCF			=		-g ${SRCS}
 
 ${NAME}     :       
-					${CC} ${CF} -o ${NAME}
+					${CC} ${DCF} -o ${NAME}
 
 dbg			:		fclean
 					${CC} ${DCF} -o ${NAME}
