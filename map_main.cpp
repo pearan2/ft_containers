@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 11:50:10 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/29 14:05:55 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/30 01:06:14 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "map_iterator.hpp"
 #include <map>
 #include "map.hpp"
+#include <list>
 
 #ifndef TEST_NS
 # define TEST_NS ft
@@ -28,6 +29,45 @@
 #ifndef TEST_TV
 # define TEST_TV int
 #endif
+
+#define T1 int
+#define T2 std::string
+typedef TEST_NS::map<T1, T2>::value_type T3;
+
+static int iter = 0;
+
+
+template <typename T>
+std::string	printPair(const T &iterator, bool nl = true, std::ostream &o = std::cout)
+{
+	o << "key: " << iterator->first << " | value: " << iterator->second;
+	if (nl)
+		o << std::endl;
+	return ("");
+}
+
+void	printSize(TEST_NS::map<T1, T2> const &mp, bool print_content = 1)
+{
+	std::cout << "size: " << mp.size() << std::endl;
+	//std::cout << "max_size: " << mp.max_size() << std::endl;
+	if (print_content)
+	{
+		TEST_NS::map<T1, T2>::const_iterator it = mp.begin(), ite = mp.end();
+		std::cout << std::endl << "Content is:" << std::endl;
+		for (; it != ite; ++it)
+			std::cout << "- " << printPair(it, false) << std::endl;
+	}
+	std::cout << "###############################################" << std::endl;
+}
+
+
+template <typename MAP>
+void	ft_erase(MAP &mp, const T1 param)
+{
+	std::cout << "\t-- [" << iter++ << "] --" << std::endl;
+	mp.erase(param);
+	printSize(mp);
+}
 
 
 TEST_TV			main()
@@ -166,4 +206,384 @@ TEST_TV			main()
 	std::cout << '\n';
 
 	std::cout << "==================== key_comp test end =============================" << std::endl;
+
+	std::cout << "==================== value_comp test start =============================" << std::endl;
+	
+	TEST_NS::map<TEST_TK,TEST_TV> map_valuecomp;
+
+	map_valuecomp['x']=1001;
+	map_valuecomp['y']=2002;
+	map_valuecomp['z']=3003;
+
+	std::cout << "map_valuecomp contains:\n";
+
+	TEST_NS::pair<TEST_TK,TEST_TV> highest_vc = *map_valuecomp.rbegin();					// last element
+
+	TEST_NS::map<TEST_TK,TEST_TV>::iterator iter_valuecomp = map_valuecomp.begin();
+	do {
+		std::cout << iter_valuecomp->first << " => " << iter_valuecomp->second << '\n';
+	} while ( map_valuecomp.value_comp()(*iter_valuecomp++, highest_vc) );
+
+	std::cout << "==================== value_comp test end =============================" << std::endl;
+
+	std::cout << "==================== count test start =============================" << std::endl;
+	
+	TEST_NS::map<TEST_TK,TEST_TV> map_count;
+	TEST_TK c;
+
+	map_count ['a']=101;
+	map_count ['c']=202;
+	map_count ['f']=303;
+
+	for (c='a'; c<'h'; c++)
+	{
+		std::cout << c;
+		if (map_count.count(c)>0)
+			std::cout << " is an element of map_count.\n";
+		else 
+			std::cout << " is not an element of map_count.\n";
+	}
+
+	
+	std::cout << "==================== count test end =============================" << std::endl;
+
+	std::cout << "==================== bound test start =============================" << std::endl;
+
+	TEST_NS::map<TEST_TK, TEST_TV> map_lb1;
+	TEST_NS::map<TEST_TK, TEST_TV>::iterator itlow,itup;
+
+
+	map_lb1['a']=20;
+	map_lb1['b']=40;
+	map_lb1['c']=60;
+	map_lb1['d']=80;
+	map_lb1['e']=100;
+
+	itlow=map_lb1.lower_bound ('b');	// itlow points to b
+	std::cout << itlow->first << std::endl;
+
+	// if (itlow != map_lb1.end())
+	// 	std::cout << itlow->first << " | " << itlow->second << std::endl;
+	// else
+	// 	std::cout << "can not find" << std::endl;
+	itup=map_lb1.upper_bound ('d');	 // itup points to e (not d!)
+
+	std::cout << itup->first << std::endl;
+
+	map_lb1.erase(itlow,itup);				// erases [itlow,itup)
+
+	//print content:
+	for (TEST_NS::map<TEST_TK, TEST_TV>::iterator it=map_lb1.begin(); it!=map_lb1.end(); ++it)
+		std::cout << it->first << " => " << it->second << '\n';
+
+
+	std::cout << "==================== bound test end =============================" << std::endl;
+
+	std::cout << "==================== equal_range test start =============================" << std::endl;
+  
+	TEST_NS::map<TEST_TK, TEST_TV> map_equalrange;
+
+	map_equalrange['a']=10;
+	map_equalrange['b']=20;
+	map_equalrange['c']=30;
+
+	TEST_NS::pair<TEST_NS::map<TEST_TK, TEST_TV>::iterator,TEST_NS::map<TEST_TK, TEST_TV>::iterator> ret;
+	ret = map_equalrange.equal_range('b');
+
+	std::cout << "lower bound points to: ";
+	std::cout << ret.first->first << " => " << ret.first->second << '\n';
+
+	std::cout << "upper bound points to: ";
+	std::cout << ret.second->first << " => " << ret.second->second << '\n';
+
+	
+	std::cout << "==================== equal_range test end =============================" << std::endl;
+
+	// std::list<T3> lst;
+	// unsigned int lst_size = 7;
+	// for (unsigned int i = 0; i < lst_size; ++i)
+	// 	lst.push_back(T3(lst_size - i, i));
+
+	// TEST_NS::map<T1, T2> mp(lst.begin(), lst.end());
+	// TEST_NS::map<T1, T2>::iterator ibegin = mp.begin(), iend = mp.end();
+
+	// TEST_NS::map<T1, T2> mp_range(ibegin, --(--iend));
+	// for (int i = 0; ibegin != iend; ++ibegin)
+	// 	ibegin->second = ++i * 5;
+
+	// ibegin = mp.begin(); iend = --(--mp.end());
+	// TEST_NS::map<T1, T2> mp_copy(mp);
+	// for (int i = 0; ibegin != iend; ++ibegin)
+	// 	ibegin->second = ++i * 7;
+
+	// std::cout << "\t-- PART ONE --" << std::endl;
+	// printSize(mp);
+	// printSize(mp_range);
+	// printSize(mp_copy);
+
+	// mp = mp_copy;
+	// mp_copy = mp_range;
+	// mp_range.clear();
+
+	// std::cout << "\t-- PART TWO --" << std::endl;
+	// printSize(mp);
+	// printSize(mp_range);
+	// printSize(mp_copy);
+
+	std::cout << "==================== erase test start =============================" << std::endl;
+
+	TEST_NS::map<TEST_TK, TEST_TV> map_erase2;
+
+	map_erase2['a'] = 5;
+	map_erase2['b'] = 15;
+	map_erase2['e'] = 25;
+	map_erase2['z'] = 35;
+
+	map_erase2.erase(map_erase2.begin(), map_erase2.end());
+
+	std::cout << map_erase2.size() << std::endl;
+
+	for (TEST_NS::map<TEST_TK, TEST_TV>::iterator iter = map_erase2.begin(); iter != map_erase2.end(); iter++)
+		std::cout << iter->first << " | " << iter->second << std::endl;
+
+	std::cout << "==================== erase test end =============================" << std::endl;
+
+	std::cout << "==================== input test start =============================" << std::endl;
+
+	TEST_NS::map<int, std::string> map_input;
+	map_input[0] = "AAAAAA";
+	map_input[1] = "BBBBB";
+	map_input[2] = "CCCC";
+	map_input[3] = "DDD";
+	map_input[4] = "EE";
+	map_input[5] = "F";
+
+	map_input[10] = "Hi there";
+	map_input[10] = "Hi there";
+	for(TEST_NS::map<int, std::string>::iterator iter = map_input.begin(); iter != map_input.end(); iter++)
+		std::cout << iter->first << " | " << iter->second << std::endl;
+
+	std::cout << "==================== input test end =============================" << std::endl;
+
+
+	std::cout << "==================== tricky erase test start =============================" << std::endl;
+
+
+	TEST_NS::map<T1, T2> mp;
+
+	mp[42] = "lol";
+
+	mp[50] = "mdr";
+	mp[25] = "funny";
+
+	mp[46] = "bunny";
+	mp[21] = "fizz";
+	mp[30] = "buzz";
+	mp[55] = "fuzzy";
+
+	mp[18] = "bee";
+	mp[23] = "coconut";
+	mp[28] = "diary";
+	mp[35] = "fiesta";
+	mp[44] = "hello";
+	mp[48] = "world";
+	mp[53] = "this is a test";
+	mp[80] = "hey";
+
+	mp[12] = "no";
+	mp[20] = "idea";
+	mp[22] = "123";
+	mp[24] = "345";
+	mp[27] = "27";
+	mp[29] = "29";
+	mp[33] = "33";
+	mp[38] = "38";
+
+	mp[43] = "1";
+	mp[45] = "2";
+	mp[47] = "3";
+	mp[49] = "4";
+	mp[51] = "5";
+	mp[54] = "6";
+	mp[60] = "7";
+	mp[90] = "8";
+
+	printSize(mp);
+
+	/* A classic btree should give this:
+	 *                                      42
+	 *                     /                                            \
+	 *                    25                                            50
+	 *           /                 \                         /                       \
+	 *          21                 30                       46                       55
+	 *      /       \           /      \                /       \             /           \
+	 *     18       23        28        35            44         48         53             80
+	 *   /   \    /    \    /    \     /   \        /   \       /   \     /    \         /     \
+	 *  12   20  22    24  27    29  33    38     43    45    47    49   51    54       60      90
+	 *
+	 * */
+
+	ft_erase(mp, 25); // right != NULL; left != NULL
+	ft_erase(mp, 55); // right != NULL; left != NULL
+
+	/* After deleting 25 and 55, I would get:
+	 *                                      42
+	 *                     /                                            \
+	 *                    24                                            50
+	 *           /                 \                         /                      \
+	 *          21                 30                       46                      54
+	 *      /       \           /      \                /       \             /           \
+	 *     18       23        28        35            44         48         53             80
+	 *   /   \    /         /    \     /   \        /   \       /   \     /              /     \
+	 *  12   20  22        27    29  33    38     43    45    47    49   51             60      90
+	 *
+	 * */
+
+	ft_erase(mp, 24); // right != NULL; left != NULL
+	ft_erase(mp, 54); // right != NULL; left != NULL
+
+	/* After deleting 24 and 54, I would get:
+	 *                                      42
+	 *                     /                                            \
+	 *                    23                                            50
+	 *           /                 \                         /                      \
+	 *          21                 30                       46                      53
+	 *      /       \           /      \                /       \             /           \
+	 *     18       22        28        35            44         48         51             80
+	 *   /   \              /    \     /   \        /   \       /   \                    /     \
+	 *  12   20            27    29  33    38     43    45    47    49                  60      90
+	 *
+	 * */
+
+	std::cout << "ff here" << std::endl;
+	ft_erase(mp, 22); // right == NULL; left == NULL
+	ft_erase(mp, 51); // right == NULL; left == NULL
+	
+
+	ft_erase(mp, 21); // right == NULL; left != NULL
+	ft_erase(mp, 53); // right != NULL; left == NULL
+
+	/* After deleting 22, 51 and then 21, 53, I would get:
+	 *                                      42
+	 *                     /                                            \
+	 *                    23                                            50
+	 *           /                 \                         /                      \
+	 *          20                 30                       46                      80
+	 *      /                   /      \                /       \                /        \
+	 *     18                 28        35            44         48             60         90
+	 *   /                  /    \     /   \        /   \       /   \
+	 *  12                 27    29  33    38     43    45    47    49
+	 *
+	 * */
+
+	ft_erase(mp, 20); // right == NULL; left != NULL
+
+	/* After deleting 20, I would get:
+	 *                                      42
+	 *                     /                                            \
+	 *                    23                                            50
+	 *           /                 \                         /                      \
+	 *          18                 30                       46                      80
+	 *      /                   /      \                /       \                /        \
+	 *     12                 28        35            44         48             60         90
+	 *                      /    \     /   \        /   \       /   \
+	 *                     27    29  33    38     43    45    47    49
+	 *
+	 * */
+
+	ft_erase(mp, 23); // right != NULL; left != NULL
+
+	/* After deleting 23, I would get:
+	 *                                      42
+	 *                     /                                            \
+	 *                    18                                            50
+	 *           /                 \                         /                      \
+	 *          12                 30                       46                      80
+	 *                          /      \                /       \                /        \
+	 *                        28        35            44         48             60         90
+	 *                      /    \     /   \        /   \       /   \
+	 *                     27    29  33    38     43    45    47    49
+	 *
+	 * */
+
+	ft_erase(mp, 42); // right != NULL; left != NULL; parent == NULL
+
+	/* After deleting 42, I would get:
+	 *                                      38
+	 *                     /                                            \
+	 *                    18                                            50
+	 *           /                 \                         /                      \
+	 *          12                 30                       46                      80
+	 *                          /      \                /       \                /        \
+	 *                        28        35            44         48             60         90
+	 *                      /    \     /            /   \       /   \
+	 *                     27    29  33           43    45    47    49
+	 *
+	 * */
+
+	ft_erase(mp, 38); // right != NULL; left != NULL; parent == NULL
+
+	/* After deleting 38, I would get:
+	 *                                      35
+	 *                     /                                            \
+	 *                    18                                            50
+	 *           /                 \                         /                      \
+	 *          12                 30                       46                      80
+	 *                          /      \                /       \                /        \
+	 *                        28        33            44         48             60         90
+	 *                      /    \                  /   \       /   \
+	 *                     27    29               43    45    47    49
+	 *
+	 * */
+
+	ft_erase(mp, 35); // right != NULL; left != NULL; parent == NULL
+
+	/* After deleting 35, I would get:
+	 *                                      33
+	 *                     /                                            \
+	 *                    18                                            50
+	 *           /                 \                         /                      \
+	 *          12                 30                       46                      80
+	 *                          /                       /       \                /        \
+	 *                        28                      44         48             60         90
+	 *                      /    \                  /   \       /   \
+	 *                     27    29               43    45    47    49
+	 *
+	 * */
+
+	ft_erase(mp, 33); // right != NULL; left != NULL; parent == NULL
+
+	/* After deleting 33, I would get:
+	 *                                      30
+	 *                     /                                            \
+	 *                    18                                            50
+	 *           /                 \                         /                      \
+	 *          12                 28                       46                      80
+	 *                          /      \                /       \                /        \
+	 *                        27       29             44         48             60         90
+	 *                                              /   \       /   \
+	 *                                            43    45    47    49
+	 *
+	 * */
+
+
+
+	std::cout << "==================== tricky erase test end =============================" << std::endl;
+
+
+	std::cout << "==================== const iter test start ==============================" << std::endl;
+
+	TEST_NS::map<TEST_TK, TEST_TV> map_const;
+
+	map_const['a'] = 1;
+	map_const['b'] = 2;
+	map_const['c'] = 3;
+	map_const['d'] = 4;
+
+	TEST_NS::map<TEST_TK, TEST_TV>::const_iterator c_iter = map_const.begin();
+	//c_iter->second = 11;
+
+	
+
+	std::cout << "==================== const iter test start ==============================" << std::endl;
 }

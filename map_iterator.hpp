@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 04:30:58 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/29 14:12:49 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/30 00:57:58 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ namespace ft
 	{
 		private :
 			node<TK, TV, Compare>* now;
+			node<TK, TV, Compare>* rootPtr;
 			Compare cmp;
 
 			class OutOfRangeException : public std::exception
@@ -47,48 +48,18 @@ namespace ft
 				}
 			};
 
-			node<TK, TV, Compare>* getPrev()
-			{
-				if (now == NULL)
-					throw (OutOfRangeException());
-
-				if (now->getLeft() != NULL)
-					return (now->getRightest(now->getLeft()));
-				
-				node<TK, TV, Compare>* parent = now->getParent();
-				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
-					parent = parent->getParent();
-				
-				return (parent);
-			}
-
-			node<TK, TV, Compare>* getNext()
-			{
-				if (now == NULL)
-					throw (OutOfRangeException());
-
-				if (now->getRight() != NULL)
-					return (now->getLeftest(now->getRight()));
-				
-				node<TK, TV, Compare>* parent = now->getParent();
-				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
-					parent = parent->getParent();
-			
-				return (parent);
-			}
-
 		public	:
 			mapIterator()
 			{
 				
 			}
 
-			mapIterator(node<TK, TV, Compare> *now) : now(now)
+			mapIterator(node<TK, TV, Compare> *now, node<TK, TV, Compare> *rootPtr) : now(now), rootPtr(rootPtr)
 			{
 				
 			}
 
-			mapIterator(const mapIterator<TK, TV, Compare>& origin) : now(origin.now)
+			mapIterator(const mapIterator<TK, TV, Compare>& origin) : now(origin.getNow()), rootPtr(origin.getRootPtr())
 			{
 
 			}
@@ -100,7 +71,8 @@ namespace ft
 
 			mapIterator<TK, TV, Compare>& operator=(const mapIterator<TK, TV, Compare>& origin)
 			{
-				this->now = origin.now;
+				this->now = origin.getNow();
+				this->rootPtr = origin.getRootPtr();
 				return (*this);
 			}
 
@@ -109,7 +81,7 @@ namespace ft
 				return (now->ip);
 			}
 
-			pair<const TK, TV>* operator->(void)
+			pair<const TK, TV>* operator->(void) const
 			{
 				return (&(this->operator*()));
 			}
@@ -164,6 +136,39 @@ namespace ft
 			{
 				return (this->now);
 			}
+
+			node<TK, TV, Compare>* getRootPtr() const
+			{
+				return (this->rootPtr);
+			}
+
+			node<TK, TV, Compare>* getPrev() const
+			{
+				if (now == NULL)
+					return (now->getRightest(rootPtr));
+		
+				if (now->getLeft() != NULL)
+					return (now->getRightest(now->getLeft()));
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
+					parent = parent->getParent();
+				
+				return (parent);
+			}
+
+			node<TK, TV, Compare>* getNext() const
+			{
+				if (now == NULL)
+					return (now->getLeftest(rootPtr));
+
+				if (now->getRight() != NULL)
+					return (now->getLeftest(now->getRight()));
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
+					parent = parent->getParent();
+			
+				return (parent);
+			}
 	};
 
 	template <typename TK, typename TV, class Compare = ft::less<TK> >
@@ -171,6 +176,7 @@ namespace ft
 	{
 		private :
 			node<TK, TV, Compare>* now;
+			node<TK, TV, Compare>* rootPtr;
 			Compare cmp;
 
 			class OutOfRangeException : public std::exception
@@ -181,53 +187,23 @@ namespace ft
 				}
 			};
 
-			node<TK, TV, Compare>* getPrev()
-			{
-				if (now == NULL)
-					throw (OutOfRangeException());
-
-				if (now->getLeft() != NULL)
-					return (now->getRightest(now->getLeft()));
-				
-				node<TK, TV, Compare>* parent = now->getParent();
-				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
-					parent = parent->getParent();
-				
-				return (parent);
-			}
-
-			node<TK, TV, Compare>* getNext()
-			{
-				if (now == NULL)
-					throw (OutOfRangeException());
-
-				if (now->getRight() != NULL)
-					return (now->getLeftest(now->getRight()));
-				
-				node<TK, TV, Compare>* parent = now->getParent();
-				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
-					parent = parent->getParent();
-			
-				return (parent);
-			}
-
 		public	:
 			mapConstIterator()
 			{
 				
 			}
 
-			mapConstIterator(node<TK, TV, Compare> *now) : now(now)
-			{
-				
-			}
-
-			mapConstIterator(const mapConstIterator<TK, TV, Compare>& origin) : now(origin.now)
+			mapConstIterator(node<TK, TV, Compare> *now, node<TK, TV, Compare> *rootPtr) : now(now), rootPtr(rootPtr)
 			{
 
 			}
 
-			mapConstIterator(const mapIterator<TK, TV, Compare>& origin) : now(origin.getNow())
+			mapConstIterator(const mapConstIterator<TK, TV, Compare>& origin) : now(origin.getNow()), rootPtr(origin.getRootPtr())
+			{
+
+			}
+
+			mapConstIterator(const mapIterator<TK, TV, Compare>& origin) : now(origin.getNow()), rootPtr(origin.getRootPtr())
 			{
 
 			}
@@ -239,13 +215,15 @@ namespace ft
 
 			mapConstIterator<TK, TV, Compare>& operator=(const mapConstIterator<TK, TV, Compare>& origin)
 			{
-				this->now = origin.now;
+				this->now = origin.getNow();
+				this->rootPtr = origin.getRootPtr();
 				return (*this);
 			}
 
 			mapConstIterator<TK, TV, Compare>& operator=(const mapIterator<TK, TV, Compare>& origin)
 			{
 				this->now = origin.getNow();
+				this->rootPtr = origin.getRootPtr();
 				return (*this);
 			}
 
@@ -254,7 +232,7 @@ namespace ft
 				return (now->ip);
 			}
 
-			const pair<const TK, TV>* operator->(void)
+			const pair<const TK, TV>* operator->(void) const
 			{
 				return (&(this->operator*()));
 			}
@@ -305,9 +283,41 @@ namespace ft
 				return (!operator==(origin));
 			}
 
-			const node<TK, TV, Compare>* getNow() const
+			node<TK, TV, Compare>* getNow() const
 			{
 				return (this->now);
+			}
+
+			node<TK, TV, Compare>* getRootPtr() const
+			{
+				return (this->rootPtr);
+			}
+
+			node<TK, TV, Compare>* getPrev() const
+			{
+				if (now == NULL)
+					return (now->getRightest(rootPtr));
+				if (now->getLeft() != NULL)
+					return (now->getRightest(now->getLeft()));
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
+					parent = parent->getParent();
+				
+				return (parent);
+			}
+
+			node<TK, TV, Compare>* getNext() const
+			{
+				if (now == NULL)
+					return (now->getLeftest(rootPtr));
+
+				if (now->getRight() != NULL)
+					return (now->getLeftest(now->getRight()));
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
+					parent = parent->getParent();
+			
+				return (parent);
 			}
 	};
 
@@ -316,6 +326,7 @@ namespace ft
 	{
 		private :
 			node<TK, TV, Compare>* now;
+			node<TK, TV, Compare>* rootPtr;
 			Compare cmp;
 
 			class OutOfRangeException : public std::exception
@@ -326,48 +337,23 @@ namespace ft
 				}
 			};
 
-			node<TK, TV, Compare>* getNext()
-			{
-				if (now == NULL)
-					throw (OutOfRangeException());
-
-				if (now->getLeft() != NULL)
-					return (now->getRightest(now->getLeft()));
-				
-				node<TK, TV, Compare>* parent = now->getParent();
-				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
-					parent = parent->getParent();
-				
-				return (parent);
-			}
-
-			node<TK, TV, Compare>* getPrev()
-			{
-				if (now == NULL)
-					throw (OutOfRangeException());
-
-				if (now->getRight() != NULL)
-					return (now->getLeftest(now->getRight()));
-				
-				node<TK, TV, Compare>* parent = now->getParent();
-				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
-					parent = parent->getParent();
-			
-				return (parent);
-			}
-
 		public	:
 			mapReverseIterator()
 			{
 				
 			}
 
-			mapReverseIterator(node<TK, TV, Compare> *now) : now(now)
+			mapReverseIterator(node<TK, TV, Compare> *now, node<TK, TV, Compare> *rootPtr) : now(now), rootPtr(rootPtr)
 			{
 				
 			}
 
-			mapReverseIterator(const mapReverseIterator<TK, TV, Compare>& origin) : now(origin.now)
+			mapReverseIterator(const mapReverseIterator<TK, TV, Compare>& origin) : now(origin.getNow()), rootPtr(origin.getRootPtr())
+			{
+
+			}
+
+			mapReverseIterator(const mapIterator<TK, TV, Compare>& origin) : now(origin.getPrev()), rootPtr(origin.getRootPtr())
 			{
 
 			}
@@ -379,7 +365,15 @@ namespace ft
 
 			mapReverseIterator<TK, TV, Compare>& operator=(const mapReverseIterator<TK, TV, Compare>& origin)
 			{
-				this->now = origin.now;
+				this->now = origin.getNow();
+				this->rootPtr = origin.getRootPtr();
+				return (*this);
+			}
+
+			mapReverseIterator<TK, TV, Compare>& operator=(const mapIterator<TK, TV, Compare>& origin)
+			{
+				this->now = origin.getPrev();
+				this->rootPtr = origin.getRootPtr();
 				return (*this);
 			}
 
@@ -388,7 +382,7 @@ namespace ft
 				return (now->ip);
 			}
 
-			pair<const TK, TV>* operator->(void)
+			pair<const TK, TV>* operator->(void) const
 			{
 				return (&(this->operator*()));
 			}
@@ -443,6 +437,44 @@ namespace ft
 			{
 				return (this->now);
 			}
+
+			node<TK, TV, Compare>* getRootPtr() const
+			{
+				return (this->rootPtr);
+			}
+
+			node<TK, TV, Compare>* getNext() const
+			{
+				if (now == NULL)
+					return (now->getRightest(rootPtr));
+
+				if (now->getLeft() != NULL)
+					return (now->getRightest(now->getLeft()));
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
+					parent = parent->getParent();
+				
+				return (parent);
+			}
+
+			node<TK, TV, Compare>* getPrev() const
+			{
+				if (now == NULL)
+					return (now->getLeftest(rootPtr));
+
+				if (now->getRight() != NULL)
+					return (now->getLeftest(now->getRight()));
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
+					parent = parent->getParent();
+			
+				return (parent);
+			}
+
+			mapIterator<TK, TV, Compare> base(void) const
+			{
+				return (mapIterator<TK, TV, Compare>(getPrev(), rootPtr));
+			}
 	};
 	
 	template <typename TK, typename TV, class Compare = ft::less<TK> >
@@ -450,6 +482,7 @@ namespace ft
 	{
 		private :
 			node<TK, TV, Compare>* now;
+			node<TK, TV, Compare>* rootPtr;
 			Compare cmp;
 
 			class OutOfRangeException : public std::exception
@@ -460,57 +493,37 @@ namespace ft
 				}
 			};
 
-			node<TK, TV, Compare>* getNext()
-			{
-				if (now == NULL)
-					throw (OutOfRangeException());
-
-				if (now->getLeft() != NULL)
-					return (now->getRightest(now->getLeft()));
-				
-				node<TK, TV, Compare>* parent = now->getParent();
-				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
-					parent = parent->getParent();
-				
-				return (parent);
-			}
-
-			node<TK, TV, Compare>* getPrev()
-			{
-				if (now == NULL)
-					throw (OutOfRangeException());
-
-				if (now->getRight() != NULL)
-					return (now->getLeftest(now->getRight()));
-				
-				node<TK, TV, Compare>* parent = now->getParent();
-				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
-					parent = parent->getParent();
-			
-				return (parent);
-			}
-
 		public	:
 			mapReverseConstIterator()
 			{
 				
 			}
 
-			mapReverseConstIterator(node<TK, TV, Compare> *now) : now(now)
+			mapReverseConstIterator(node<TK, TV, Compare> *now, node<TK, TV, Compare> * rootPtr) : now(now), rootPtr(rootPtr)
 			{
 				
 			}
 
-			mapReverseConstIterator(const mapReverseConstIterator<TK, TV, Compare>& origin) : now(origin.now)
+			mapReverseConstIterator(const mapReverseConstIterator<TK, TV, Compare>& origin) : now(origin.getNow()), rootPtr(origin.getRootPtr())
 			{
 
 			}
 
-			mapReverseConstIterator(const mapReverseIterator<TK, TV, Compare>& origin) : now(origin.getNow())
+			mapReverseConstIterator(const mapReverseIterator<TK, TV, Compare>& origin) : now(origin.getNow()), rootPtr(origin.getRootPtr())
+			{
+
+			}
+			/////////////////////
+			mapReverseConstIterator(const mapConstIterator<TK, TV, Compare>& origin) : now(origin.getPrev()), rootPtr(origin.getRootPtr())
 			{
 
 			}
 
+			mapReverseConstIterator(const mapIterator<TK, TV, Compare>& origin) : now(origin.getPrev()), rootPtr(origin.getRootPtr())
+			{
+
+			}
+			///////////////////////
 			~mapReverseConstIterator()
 			{
 
@@ -518,22 +531,41 @@ namespace ft
 
 			mapReverseConstIterator<TK, TV, Compare>& operator=(const mapReverseConstIterator<TK, TV, Compare>& origin)
 			{
-				this->now = origin.now;
+				this->now = origin.getNow();
+				this->rootPtr = origin.getRootPtr();
 				return (*this);
 			}
 
 			mapReverseConstIterator<TK, TV, Compare>& operator=(const mapReverseIterator<TK, TV, Compare>& origin)
 			{
 				this->now = origin.getNow();
+				this->rootPtr = origin.getRootPtr();
 				return (*this);
 			}
 
-			pair<const TK, TV>& operator*(void) const
+
+			////////////////////////
+			mapReverseConstIterator<TK, TV, Compare>& operator=(const mapConstIterator<TK, TV, Compare>& origin)
+			{
+				this->now = origin.getPrev();
+				this->rootPtr = origin.getRootPtr();
+				return (*this);
+			}
+
+			mapReverseConstIterator<TK, TV, Compare>& operator=(const mapIterator<TK, TV, Compare>& origin)
+			{
+				this->now = origin.getPrev();
+				this->rootPtr = origin.getRootPtr();
+				return (*this);
+			}			
+			////////////////////////
+
+			const pair<const TK, TV>& operator*(void) const
 			{
 				return (now->ip);
 			}
 
-			pair<const TK, TV>* operator->(void)
+			const pair<const TK, TV>* operator->(void) const
 			{
 				return (&(this->operator*()));
 			}
@@ -584,9 +616,47 @@ namespace ft
 				return (!operator==(origin));
 			}
 
-			const node<TK, TV, Compare>* getNow() const
+			node<TK, TV, Compare>* getNow() const
 			{
 				return (this->now);
+			}
+
+			node<TK, TV, Compare>* getRootPtr() const
+			{
+				return (this->rootPtr);
+			}
+
+			node<TK, TV, Compare>* getNext() const
+			{
+				if (now == NULL)
+					return (now->getRightest(rootPtr));
+
+				if (now->getLeft() != NULL)
+					return (now->getRightest(now->getLeft()));
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
+					parent = parent->getParent();
+				
+				return (parent);
+			}
+
+			node<TK, TV, Compare>* getPrev() const
+			{
+				if (now == NULL)
+					return (now->getLeftest(rootPtr));
+
+				if (now->getRight() != NULL)
+					return (now->getLeftest(now->getRight()));
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
+					parent = parent->getParent();
+			
+				return (parent);
+			}
+
+			mapConstIterator<TK, TV, Compare> base(void) const
+			{
+				return (mapConstIterator<TK, TV, Compare>(getPrev(), rootPtr));
 			}
 	};
 }

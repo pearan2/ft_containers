@@ -6,7 +6,7 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/28 12:01:00 by honlee           ###   ########.fr        #
+#    Updated: 2021/04/29 17:28:02 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ CF			=		-Wall -Wextra -Werror -std=c++98 ${SRCS}
 DCF			=		-g ${SRCS}
 
 ${NAME}     :       
-					${CC} ${DCF} -o ${NAME}
+					${CC} ${CF} -o ${NAME}
 
 dbg			:		fclean
 					${CC} ${DCF} -o ${NAME}

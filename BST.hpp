@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 11:07:41 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/29 14:10:33 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/29 23:59:48 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,10 +76,18 @@ namespace ft
 			node*	left;
 			node*	right;
 			Compare cmp;
-
-			node(){}
+			
 			node<TK, TV, Compare>& operator=(const node<TK, TV, Compare>& origin)
 			{
+				delete (parent);
+				parent = new node<TK, TV, Compare>(origin.parent);
+				delete (left);
+				left = new node<TK, TV, Compare>(origin.left);
+				delete (right);
+				right = new node<TK, TV, Compare>(origin.right);
+
+				ip = origin.ip;
+
 				return (*this);
 			}
 			void childChange(node *from, node *to)
@@ -92,14 +100,36 @@ namespace ft
 
 			void makeParentChildToMyChild()
 			{
+				if (parent == NULL)
+					return ;
 				if (left == NULL)
 					parent->childChange(this, right);
 				else
 					parent->childChange(this, left);
 			}
 
+			bool isFirstSmall(const TK& t1, const TK& t2)
+			{
+				return (cmp(t1, t2));
+			}
+
+			bool isFirstEqualOrSmall(const TK& t1, const TK& t2)
+			{
+				return (!cmp(t2, t1));
+			}
+
+			bool isSame(const TK& t1, const TK& t2)
+			{
+				return ( (!cmp(t1, t2)) && (!cmp(t2, t1)) );
+			}
+
 		public	:
 			pair<const TK, TV>	ip;
+
+			node() : parent(NULL), left(NULL), right(NULL)
+			{
+
+			}
 
 			node(TK first, TV second = TV()) : parent(NULL), left(NULL), right(NULL), ip(first, second)
 			{
@@ -120,7 +150,14 @@ namespace ft
 
 			~node()
 			{
-				//std::cout << first << " | " << second << "   valued node destroyed :(" << std::endl;
+				
+			}
+
+			node<TK, TV, Compare>* getRoot(node<TK, TV, Compare>* root)
+			{
+				if (root->parent == NULL)
+					return (root);
+				return (getRoot(root->parent));
 			}
 
 			void deleteAll(node<TK, TV, Compare>* root)
@@ -136,8 +173,6 @@ namespace ft
 
 			node<TK, TV, Compare>* find(node<TK, TV, Compare> *root, const TK& tk)
 			{
-				node<TK, TV, Compare>* child;
-
 				if ((cmp(root->ip.first, tk) == false) && (cmp(tk, root->ip.first) == false))
 					return (root);
 				
@@ -191,6 +226,47 @@ namespace ft
 				}
 			}
 
+			//key 보다 큰값중 가장 작은 값
+			node<TK, TV, Compare>* getUpperBound(node<TK, TV, Compare> *root, const TK& key)
+			{		
+				if (isFirstEqualOrSmall(root->ip.first, key)) // key 가 더 큼 -> 더큰놈을 찾으러 가야함.
+				{
+					if (root->right == NULL)
+						return (NULL);
+					else 
+						return (getUpperBound(root->right, key));
+				}
+				else // key 가 더 작음.
+				{
+					if (root->left == NULL)
+						return (root);
+					else
+						return (getUpperBound(root->left, key));
+				}
+			}
+
+			//key 보다 큰값중 가장 작거나 같은 값
+			node<TK, TV, Compare>* getLowerBound(node<TK, TV, Compare> *root, const TK& key)
+			{
+				if (isSame(root->ip.first, key)) // 값이 같다면 즉시 리턴
+					return (root);
+				
+				if (isFirstSmall(root->ip.first, key)) // key 가 더 큼 -> 더큰놈을 찾으러 가야함.
+				{
+					if (root->right == NULL)
+						return (NULL);
+					else 
+						return (getLowerBound(root->right, key));
+				}
+				else // key 가 더 작음.
+				{
+					if (root->left == NULL)
+						return (root);
+					else
+						return (getLowerBound(root->left, key));
+				}
+			}
+
 			node<TK, TV, Compare>* getLeftest(node<TK, TV, Compare> *root)
 			{
 				if (root == NULL || root->left == NULL)
@@ -216,6 +292,14 @@ namespace ft
 					{
 						newRoot = getRightest(root->left);
 						newRoot->makeParentChildToMyChild(); // 부모와 자신자식의 라인을 이어준다. (이떄 newRoot 는 반드시 자식이 하나이므로 반드시 연결된다.)
+						
+						////////////
+						if (newRoot->left != NULL)
+							newRoot->left->parent = newRoot->parent;
+						if (newRoot->right != NULL)
+							newRoot->right->parent = newRoot->parent;
+						///////////
+						
 						newRoot->left = root->left;
 						newRoot->right = root->right;
 						newRoot->parent = root->parent;
@@ -233,6 +317,14 @@ namespace ft
 					{
 						newRoot = getLeftest(root->right);
 						newRoot->makeParentChildToMyChild(); // 부모와 자신자식의 라인을 이어준다. (이떄 newRoot 는 반드시 자식이 하나이므로 반드시 연결된다.)
+						
+						////////////
+						if (newRoot->left != NULL)
+							newRoot->left->parent = newRoot->parent;
+						if (newRoot->right != NULL)
+							newRoot->right->parent = newRoot->parent;
+						///////////
+						
 						newRoot->left = root->left;
 						newRoot->right = root->right;
 						newRoot->parent = root->parent;
