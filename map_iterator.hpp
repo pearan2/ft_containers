@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 04:30:58 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/28 05:58:30 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/29 14:12:49 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,17 @@ namespace ft
 	template <typename TK, typename TV, class Compare>
 	class mapConstIterator;
 
+	template <typename TK, typename TV, class Compare>
+	class mapReverseIterator;
+
+	template <typename TK, typename TV, class Compare>
+	class mapReverseConstIterator;
+
 	template <typename TK, typename TV, class Compare = ft::less<TK> >
 	class mapIterator
 	{
 		private :
-			node <TK, TV>* now;
+			node<TK, TV, Compare>* now;
 			Compare cmp;
 
 			class OutOfRangeException : public std::exception
@@ -41,7 +47,7 @@ namespace ft
 				}
 			};
 
-			node <TK, TV>* getPrev()
+			node<TK, TV, Compare>* getPrev()
 			{
 				if (now == NULL)
 					throw (OutOfRangeException());
@@ -49,14 +55,14 @@ namespace ft
 				if (now->getLeft() != NULL)
 					return (now->getRightest(now->getLeft()));
 				
-				node <TK, TV>* parent = now->getParent();
-				while (parent != NULL && cmp(now->first, parent->first))
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
 					parent = parent->getParent();
 				
 				return (parent);
 			}
 
-			node <TK, TV>* getNext()
+			node<TK, TV, Compare>* getNext()
 			{
 				if (now == NULL)
 					throw (OutOfRangeException());
@@ -64,8 +70,8 @@ namespace ft
 				if (now->getRight() != NULL)
 					return (now->getLeftest(now->getRight()));
 				
-				node <TK, TV>* parent = now->getParent();
-				while (parent != NULL && cmp(parent->first, now->first))
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
 					parent = parent->getParent();
 			
 				return (parent);
@@ -77,12 +83,12 @@ namespace ft
 				
 			}
 
-			mapIterator(node <TK, TV> *now) : now(now)
+			mapIterator(node<TK, TV, Compare> *now) : now(now)
 			{
 				
 			}
 
-			mapIterator(const mapIterator<TK, TV>& origin) : now(origin.now)
+			mapIterator(const mapIterator<TK, TV, Compare>& origin) : now(origin.now)
 			{
 
 			}
@@ -92,69 +98,493 @@ namespace ft
 
 			}
 
-			mapIterator<TK, TV>& operator=(const mapIterator<TK, TV>& origin)
+			mapIterator<TK, TV, Compare>& operator=(const mapIterator<TK, TV, Compare>& origin)
 			{
 				this->now = origin.now;
 				return (*this);
 			}
 
-			node <TK, TV>& operator*(void) const
+			pair<const TK, TV>& operator*(void) const
 			{
-				return (*now);
+				return (now->ip);
 			}
 
-			node <TK, TV>* operator->(void)
+			pair<const TK, TV>* operator->(void)
 			{
 				return (&(this->operator*()));
 			}
 			//전위 - 미리 증가시키고 보낸다.
-			mapIterator<TK, TV>& operator++(void)
+			mapIterator<TK, TV, Compare>& operator++(void)
 			{
 				this->now = getNext();
 				return (*this);
 			}
 			//후위 - 보내고 증가 시킨다.
-			mapIterator<TK, TV> operator++(int)
+			mapIterator<TK, TV, Compare> operator++(int)
 			{
-				mapIterator<TK, TV> temp(*this);
+				mapIterator<TK, TV, Compare> temp(*this);
 				this->now = getNext();
 				return (temp);
 			}
 			//전위 - 미리 증가시키고 보낸다.
-			mapIterator<TK, TV>& operator--(void)
+			mapIterator<TK, TV, Compare>& operator--(void)
 			{
 				this->now = getPrev();
 				return (*this);
 			}
 			//후위 - 보내고 증가
-			mapIterator<TK, TV> operator--(int)
+			mapIterator<TK, TV, Compare> operator--(int)
 			{
-				mapIterator<TK, TV> temp(*this);
+				mapIterator<TK, TV, Compare> temp(*this);
 				this->now = getPrev();
 				return (temp);
 			}
 
-			bool		  operator==(const mapIterator<TK, TV> &origin) const
+			bool		  operator==(const mapConstIterator<TK, TV, Compare> &origin) const
 			{
 				return (now == origin.getNow());
 			}
 
-			//bool		  operator==(const mapConstIterator<TK, TV> &origin) const
-			//{
-			//	return (now == origin.getNow());
-			//}
+			bool		  operator==(const mapIterator<TK, TV, Compare> &origin) const
+			{
+				return (now == origin.getNow());
+			}
 
-			bool		  operator!=(const mapIterator<TK, TV> &origin) const
+			bool		  operator!=(const mapConstIterator<TK, TV, Compare> &origin) const
 			{
 				return (!operator==(origin));
 			}
 
-			//bool		  operator!=(const mapConstIterator<TK, TV> &origin) const
-			//{
-			//	return (!operator==(origin));
-			//}
+			bool		  operator!=(const mapIterator<TK, TV, Compare> &origin) const
+			{
+				return (!operator==(origin));
+			}
 
-			node<TK, TV>* getNow() const
+			node<TK, TV, Compare>* getNow() const
+			{
+				return (this->now);
+			}
+	};
+
+	template <typename TK, typename TV, class Compare = ft::less<TK> >
+	class mapConstIterator
+	{
+		private :
+			node<TK, TV, Compare>* now;
+			Compare cmp;
+
+			class OutOfRangeException : public std::exception
+			{
+				virtual const char * what() const throw()
+				{
+					return "Iterator is out of range";
+				}
+			};
+
+			node<TK, TV, Compare>* getPrev()
+			{
+				if (now == NULL)
+					throw (OutOfRangeException());
+
+				if (now->getLeft() != NULL)
+					return (now->getRightest(now->getLeft()));
+				
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
+					parent = parent->getParent();
+				
+				return (parent);
+			}
+
+			node<TK, TV, Compare>* getNext()
+			{
+				if (now == NULL)
+					throw (OutOfRangeException());
+
+				if (now->getRight() != NULL)
+					return (now->getLeftest(now->getRight()));
+				
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
+					parent = parent->getParent();
+			
+				return (parent);
+			}
+
+		public	:
+			mapConstIterator()
+			{
+				
+			}
+
+			mapConstIterator(node<TK, TV, Compare> *now) : now(now)
+			{
+				
+			}
+
+			mapConstIterator(const mapConstIterator<TK, TV, Compare>& origin) : now(origin.now)
+			{
+
+			}
+
+			mapConstIterator(const mapIterator<TK, TV, Compare>& origin) : now(origin.getNow())
+			{
+
+			}
+
+			~mapConstIterator()
+			{
+
+			}
+
+			mapConstIterator<TK, TV, Compare>& operator=(const mapConstIterator<TK, TV, Compare>& origin)
+			{
+				this->now = origin.now;
+				return (*this);
+			}
+
+			mapConstIterator<TK, TV, Compare>& operator=(const mapIterator<TK, TV, Compare>& origin)
+			{
+				this->now = origin.getNow();
+				return (*this);
+			}
+
+			const pair<const TK, TV>& operator*(void) const
+			{
+				return (now->ip);
+			}
+
+			const pair<const TK, TV>* operator->(void)
+			{
+				return (&(this->operator*()));
+			}
+			//전위 - 미리 증가시키고 보낸다.
+			mapConstIterator<TK, TV, Compare>& operator++(void)
+			{
+				this->now = getNext();
+				return (*this);
+			}
+			//후위 - 보내고 증가 시킨다.
+			mapConstIterator<TK, TV, Compare> operator++(int)
+			{
+				mapConstIterator<TK, TV, Compare> temp(*this);
+				this->now = getNext();
+				return (temp);
+			}
+			//전위 - 미리 증가시키고 보낸다.
+			mapConstIterator<TK, TV, Compare>& operator--(void)
+			{
+				this->now = getPrev();
+				return (*this);
+			}
+			//후위 - 보내고 증가
+			mapConstIterator<TK, TV, Compare> operator--(int)
+			{
+				mapConstIterator<TK, TV, Compare> temp(*this);
+				this->now = getPrev();
+				return (temp);
+			}
+
+			bool		  operator==(const mapConstIterator<TK, TV, Compare> &origin) const
+			{
+				return (now == origin.getNow());
+			}
+
+			bool		  operator==(const mapIterator<TK, TV, Compare> &origin) const
+			{
+				return (now == origin.getNow());
+			}
+
+			bool		  operator!=(const mapConstIterator<TK, TV, Compare> &origin) const
+			{
+				return (!operator==(origin));
+			}
+
+			bool		  operator!=(const mapIterator<TK, TV, Compare> &origin) const
+			{
+				return (!operator==(origin));
+			}
+
+			const node<TK, TV, Compare>* getNow() const
+			{
+				return (this->now);
+			}
+	};
+
+	template <typename TK, typename TV, class Compare = ft::less<TK> >
+	class mapReverseIterator
+	{
+		private :
+			node<TK, TV, Compare>* now;
+			Compare cmp;
+
+			class OutOfRangeException : public std::exception
+			{
+				virtual const char * what() const throw()
+				{
+					return "Iterator is out of range";
+				}
+			};
+
+			node<TK, TV, Compare>* getNext()
+			{
+				if (now == NULL)
+					throw (OutOfRangeException());
+
+				if (now->getLeft() != NULL)
+					return (now->getRightest(now->getLeft()));
+				
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
+					parent = parent->getParent();
+				
+				return (parent);
+			}
+
+			node<TK, TV, Compare>* getPrev()
+			{
+				if (now == NULL)
+					throw (OutOfRangeException());
+
+				if (now->getRight() != NULL)
+					return (now->getLeftest(now->getRight()));
+				
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
+					parent = parent->getParent();
+			
+				return (parent);
+			}
+
+		public	:
+			mapReverseIterator()
+			{
+				
+			}
+
+			mapReverseIterator(node<TK, TV, Compare> *now) : now(now)
+			{
+				
+			}
+
+			mapReverseIterator(const mapReverseIterator<TK, TV, Compare>& origin) : now(origin.now)
+			{
+
+			}
+
+			~mapReverseIterator()
+			{
+
+			}
+
+			mapReverseIterator<TK, TV, Compare>& operator=(const mapReverseIterator<TK, TV, Compare>& origin)
+			{
+				this->now = origin.now;
+				return (*this);
+			}
+
+			pair<const TK, TV>& operator*(void) const
+			{
+				return (now->ip);
+			}
+
+			pair<const TK, TV>* operator->(void)
+			{
+				return (&(this->operator*()));
+			}
+			//전위 - 미리 증가시키고 보낸다.
+			mapReverseIterator<TK, TV, Compare>& operator++(void)
+			{
+				this->now = getNext();
+				return (*this);
+			}
+			//후위 - 보내고 증가 시킨다.
+			mapReverseIterator<TK, TV, Compare> operator++(int)
+			{
+				mapReverseIterator<TK, TV, Compare> temp(*this);
+				this->now = getNext();
+				return (temp);
+			}
+			//전위 - 미리 증가시키고 보낸다.
+			mapReverseIterator<TK, TV, Compare>& operator--(void)
+			{
+				this->now = getPrev();
+				return (*this);
+			}
+			//후위 - 보내고 증가
+			mapReverseIterator<TK, TV, Compare> operator--(int)
+			{
+				mapReverseIterator<TK, TV, Compare> temp(*this);
+				this->now = getPrev();
+				return (temp);
+			}
+
+			bool		  operator==(const mapReverseConstIterator<TK, TV, Compare> &origin) const
+			{
+				return (now == origin.getNow());
+			}
+
+			bool		  operator==(const mapReverseIterator<TK, TV, Compare> &origin) const
+			{
+				return (now == origin.getNow());
+			}
+
+			bool		  operator!=(const mapReverseConstIterator<TK, TV, Compare> &origin) const
+			{
+				return (!operator==(origin));
+			}
+
+			bool		  operator!=(const mapReverseIterator<TK, TV, Compare> &origin) const
+			{
+				return (!operator==(origin));
+			}
+
+			node<TK, TV, Compare>* getNow() const
+			{
+				return (this->now);
+			}
+	};
+	
+	template <typename TK, typename TV, class Compare = ft::less<TK> >
+	class mapReverseConstIterator
+	{
+		private :
+			node<TK, TV, Compare>* now;
+			Compare cmp;
+
+			class OutOfRangeException : public std::exception
+			{
+				virtual const char * what() const throw()
+				{
+					return "Iterator is out of range";
+				}
+			};
+
+			node<TK, TV, Compare>* getNext()
+			{
+				if (now == NULL)
+					throw (OutOfRangeException());
+
+				if (now->getLeft() != NULL)
+					return (now->getRightest(now->getLeft()));
+				
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(now->ip.first, parent->ip.first))
+					parent = parent->getParent();
+				
+				return (parent);
+			}
+
+			node<TK, TV, Compare>* getPrev()
+			{
+				if (now == NULL)
+					throw (OutOfRangeException());
+
+				if (now->getRight() != NULL)
+					return (now->getLeftest(now->getRight()));
+				
+				node<TK, TV, Compare>* parent = now->getParent();
+				while (parent != NULL && cmp(parent->ip.first, now->ip.first))
+					parent = parent->getParent();
+			
+				return (parent);
+			}
+
+		public	:
+			mapReverseConstIterator()
+			{
+				
+			}
+
+			mapReverseConstIterator(node<TK, TV, Compare> *now) : now(now)
+			{
+				
+			}
+
+			mapReverseConstIterator(const mapReverseConstIterator<TK, TV, Compare>& origin) : now(origin.now)
+			{
+
+			}
+
+			mapReverseConstIterator(const mapReverseIterator<TK, TV, Compare>& origin) : now(origin.getNow())
+			{
+
+			}
+
+			~mapReverseConstIterator()
+			{
+
+			}
+
+			mapReverseConstIterator<TK, TV, Compare>& operator=(const mapReverseConstIterator<TK, TV, Compare>& origin)
+			{
+				this->now = origin.now;
+				return (*this);
+			}
+
+			mapReverseConstIterator<TK, TV, Compare>& operator=(const mapReverseIterator<TK, TV, Compare>& origin)
+			{
+				this->now = origin.getNow();
+				return (*this);
+			}
+
+			pair<const TK, TV>& operator*(void) const
+			{
+				return (now->ip);
+			}
+
+			pair<const TK, TV>* operator->(void)
+			{
+				return (&(this->operator*()));
+			}
+			//전위 - 미리 증가시키고 보낸다.
+			mapReverseConstIterator<TK, TV, Compare>& operator++(void)
+			{
+				this->now = getNext();
+				return (*this);
+			}
+			//후위 - 보내고 증가 시킨다.
+			mapReverseConstIterator<TK, TV, Compare> operator++(int)
+			{
+				mapReverseConstIterator<TK, TV, Compare> temp(*this);
+				this->now = getNext();
+				return (temp);
+			}
+			//전위 - 미리 증가시키고 보낸다.
+			mapReverseConstIterator<TK, TV, Compare>& operator--(void)
+			{
+				this->now = getPrev();
+				return (*this);
+			}
+			//후위 - 보내고 증가
+			mapReverseConstIterator<TK, TV, Compare> operator--(int)
+			{
+				mapReverseConstIterator<TK, TV, Compare> temp(*this);
+				this->now = getPrev();
+				return (temp);
+			}
+
+			bool		  operator==(const mapReverseConstIterator<TK, TV, Compare> &origin) const
+			{
+				return (now == origin.getNow());
+			}
+
+			bool		  operator==(const mapReverseIterator<TK, TV, Compare> &origin) const
+			{
+				return (now == origin.getNow());
+			}
+
+			bool		  operator!=(const mapReverseConstIterator<TK, TV, Compare> &origin) const
+			{
+				return (!operator==(origin));
+			}
+
+			bool		  operator!=(const mapReverseIterator<TK, TV, Compare> &origin) const
+			{
+				return (!operator==(origin));
+			}
+
+			const node<TK, TV, Compare>* getNow() const
 			{
 				return (this->now);
 			}

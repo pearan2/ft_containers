@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 11:07:41 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/28 05:19:10 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/29 14:10:33 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,26 +22,46 @@ namespace ft
 	class pair
 	{
 		private	:
-			pair(){}
 
 		public	:
 			TK			first;
 			TV			second;
 
+			pair(){}
+
+						
 			pair(const TK& first, const TV& second) : first(first), second(second)
 			{
 				
 			}
+
 			pair(const pair<TK, TV>& origin) : first(origin.first), second(origin.second)
 			{
 				
 			}
+			
+			// pair<int ,int> <=> pair<const int, int>
+			template <typename CTK, typename CTV>
+			pair(const pair<CTK, CTV>& origin) : first(origin.first), second(origin.second)
+			{
+				
+			}
+
 			pair<TK, TV>& operator=(const pair<TK, TV>& origin)
 			{
 				first = origin.first;
 				second = origin.second;
 				return (*this);
 			}
+			
+			template <typename CTK, typename CTV>
+			pair<TK, TV>& operator=(const pair<CTK, CTV>& origin)
+			{
+				first = origin.first;
+				second = origin.second;
+				return (*this);
+			}
+
 			~pair()
 			{
 				
@@ -58,7 +78,7 @@ namespace ft
 			Compare cmp;
 
 			node(){}
-			node<TK, TV>& operator=(const node<TK, TV>& origin)
+			node<TK, TV, Compare>& operator=(const node<TK, TV, Compare>& origin)
 			{
 				return (*this);
 			}
@@ -79,44 +99,79 @@ namespace ft
 			}
 
 		public	:
-			const TK	first;
-			TV			second;
-			node(TK first, TV second) : parent(NULL), left(NULL), right(NULL), first(first), second(second)
+			pair<const TK, TV>	ip;
+
+			node(TK first, TV second = TV()) : parent(NULL), left(NULL), right(NULL), ip(first, second)
 			{
 				
 			}
-			node(const pair<TK, TV>& pair) : parent(NULL), left(NULL), right(NULL), first(pair.first), second(pair.second)
+			node(const pair<TK, TV>& pair) : parent(NULL), left(NULL), right(NULL), ip(pair)
 			{
 				
+			}
+			//deep copy
+			node(const node<TK, TV, Compare>& origin, node<TK, TV, Compare>* parent = NULL) : parent(parent), left(NULL), right(NULL), ip(origin.ip)
+			{
+				if (origin.left != NULL)
+					left = new node<TK, TV, Compare>(*origin.left, this);
+				if (origin.right != NULL)
+					right = new node<TK, TV, Compare>(*origin.right, this);				
 			}
 
-			node(const node<TK, TV>& origin) : parent(origin.parent), left(origin.left), right(origin.right), first(origin.first), second(origin.second)
-			{
-				
-			}
 			~node()
 			{
-				std::cout << first << " | " << second << "   valued node destroyed :(" << std::endl;
+				//std::cout << first << " | " << second << "   valued node destroyed :(" << std::endl;
+			}
+
+			void deleteAll(node<TK, TV, Compare>* root)
+			{
+				if (root == NULL)
+					return ;
+				if (root->left != NULL)
+					deleteAll(root->left);
+				if (root->right != NULL)
+					deleteAll(root->right);
+				delete(root);				
+			}
+
+			node<TK, TV, Compare>* find(node<TK, TV, Compare> *root, const TK& tk)
+			{
+				node<TK, TV, Compare>* child;
+
+				if ((cmp(root->ip.first, tk) == false) && (cmp(tk, root->ip.first) == false))
+					return (root);
+				
+				if ( cmp(root->ip.first, tk) ) // 오른쪽으로 가야한다.
+				{
+					if (root->right == NULL) // 오른쪽이 비어있다면 넣는다.
+						return (NULL);
+					return (find(root->right, tk));
+				}
+				else		// 왼쪽으로 가야한다.
+				{
+					if (root->left == NULL)
+						return (NULL);
+					return (find(root->left, tk));
+				}
 			}
 
 			//tk 가 이미 존재하는 키라면 해당 키의 벨류를 tv 로 변경.
 			//tk 가 존재하지 않는다면 만들어 집어넣음
-			//따라서 이것으로 search 까지 대신할 수 있다. (변경되거나 만들었으면 해당 노드의 포인터를 리턴하기 때문)
-			node<TK, TV>* mergeInsert(node<TK, TV> *root, const TK& tk, const TV& tv = TV())
+			node<TK, TV, Compare>* mergeInsert(node<TK, TV, Compare> *root, const TK& tk, const TV& tv = TV())
 			{
-				node<TK, TV>* child;
+				node<TK, TV, Compare>* child;
 
-				if ((cmp(root->first, tk) == false) && (cmp(tk, root->first) == false))
+				if ((cmp(root->ip.first, tk) == false) && (cmp(tk, root->ip.first) == false))
 				{
-					root->second = tv;
+					root->ip.second = tv;
 					return (root);
 				}
 				
-				if ( cmp(root->first, tk) ) // 오른쪽으로 가야한다.
+				if ( cmp(root->ip.first, tk) ) // 오른쪽으로 가야한다.
 				{
 					if (root->right == NULL) // 오른쪽이 비어있다면 넣는다.
 					{
-						child = new node<TK, TV>(tk, tv);
+						child = new node<TK, TV, Compare>(tk, tv);
 						root->right = child;
 						child->parent = root;
 						return (child);
@@ -127,7 +182,7 @@ namespace ft
 				{
 					if (root->left == NULL)
 					{
-						child = new node<TK, TV>(tk, tv);
+						child = new node<TK, TV, Compare>(tk, tv);
 						root->left = child;
 						child->parent = root;
 						return (child);
@@ -136,26 +191,26 @@ namespace ft
 				}
 			}
 
-			node<TK, TV>* getLeftest(node<TK, TV> *root)
+			node<TK, TV, Compare>* getLeftest(node<TK, TV, Compare> *root)
 			{
-				if (root->left == NULL)
+				if (root == NULL || root->left == NULL)
 					return (root);
 				return (getLeftest(root->left));
 			}
 
-			node<TK, TV>* getRightest(node<TK, TV> *root)
+			node<TK, TV, Compare>* getRightest(node<TK, TV, Compare> *root)
 			{
-				if (root->right == NULL)
+				if (root == NULL || root->right == NULL)
 					return (root);
 				return (getRightest(root->right));
 			}
 
-			//여기서 tk 는 반드시 존재한다.
-			void deleteNode(node<TK, TV>**real_root, node<TK, TV> *root, const TK& tk)
+			//여기서 tk 는 반드시 존재한다. // 만약 존재하지 않는 tk 가 들어온다면 UB 이다..?
+			void deleteNode(node<TK, TV, Compare>**real_root, node<TK, TV, Compare> *root, const TK& tk)
 			{
-				node<TK, TV> *newRoot;
+				node<TK, TV, Compare> *newRoot;
 
-				if ((cmp(root->first, tk) == false) && (cmp(tk, root->first) == false))
+				if ((cmp(root->ip.first, tk) == false) && (cmp(tk, root->ip.first) == false))
 				{
 					if (root->left != NULL)
 					{
@@ -198,24 +253,24 @@ namespace ft
 					}
 					return ;
 				}
-				if (cmp(root->first, tk) == false)
+				if (cmp(root->ip.first, tk) == false)
 					deleteNode(real_root, root->left, tk);
-				else if (cmp(root->first, tk))
+				else if (cmp(root->ip.first, tk))
 					deleteNode(real_root, root->right, tk);
 			}
 
 			//getter
-			node<TK, TV>*		getLeft()
+			node<TK, TV, Compare>*		getLeft()
 			{
 				return (this->left);
 			}
 
-			node<TK, TV>*		getRight()
+			node<TK, TV, Compare>*		getRight()
 			{
 				return (this->right);
 			}
 
-			node<TK, TV>*		getParent()
+			node<TK, TV, Compare>*		getParent()
 			{
 				return (this->parent);
 			}
