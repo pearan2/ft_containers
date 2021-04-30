@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 14:44:46 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/30 15:00:04 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/30 15:09:31 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,28 @@ namespace ft
 				head->setPrev(head->getNext());
 				head->setNext(temp);
 			}			
+
+			//swap n and n->next
+			void				swapNode(node<T>* n)
+			{
+				if (n->getNext() == NULL)
+					return ;
+				
+				node<T>* n_next = n->getNext();
+				node<T>* n_next_next = n_next->getNext();
+				node<T>* n_prev = n->getPrev();
+				
+				if (n_prev != NULL)
+					n_prev->setNext(n_next);
+				if (n_next_next != NULL)
+					n_next_next->setPrev(n);
+				
+				n->setPrev(n_next);
+				n->setNext(n_next_next);
+
+				n_next->setPrev(n_prev);
+				n_next->setNext(n);
+			}
 
 		public :
 			//member types start
@@ -542,9 +564,7 @@ namespace ft
 				{
 					if (temp->getValue() > temp->getNext()->getValue())
 					{
-						T value_temp = temp->getValue();
-						temp->setValue(temp->getNext()->getValue());
-						temp->getNext()->setValue(value_temp);
+						swapNode(temp);
 						temp = base->getNext();
 					}
 					else
@@ -560,9 +580,7 @@ namespace ft
 				{
 					if (!comp(temp->getValue(), temp->getNext()->getValue()))
 					{
-						T value_temp = temp->getValue();
-						temp->setValue(temp->getNext()->getValue());
-						temp->getNext()->setValue(value_temp);
+						swapNode(temp);
 						temp = base->getNext();
 					}
 					else

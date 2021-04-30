@@ -6,12 +6,12 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/30 12:15:49 by honlee           ###   ########.fr        #
+#    Updated: 2021/04/30 15:00:58 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS		=		\
-					queue_main.cpp\
+					list_main.cpp\
 
 NAME		=		a.out
 
