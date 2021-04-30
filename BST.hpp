@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 11:07:41 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/29 23:59:48 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/30 12:31:40 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ namespace ft
 
 			pair(){}
 
-						
 			pair(const TK& first, const TV& second) : first(first), second(second)
 			{
 				

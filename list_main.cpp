@@ -6,17 +6,21 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 18:56:50 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/26 21:05:49 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/30 14:53:44 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "list.hpp"
+#include <list>
 #include <vector>
 #include <iterator>
 #include <string>
 #include <iostream>
 
-#define TESTED_NAMESPACE ft
+#ifndef TEST_NS
+# define TEST_NS ft
+#endif
+
 #define TESTED_TYPE int
 
 class test
@@ -41,13 +45,13 @@ class test
 
 
 template <typename T>
-void	printSize(TESTED_NAMESPACE::list<T> const &lst, bool print_content = 1)
+void	printSize(TEST_NS::list<T> const &lst, bool print_content = 1)
 {
 	std::cout << "size: " << lst.size() << std::endl;
 	std::cout << "max_size: " << lst.max_size() << std::endl;
 	if (print_content)
 	{
-		typename TESTED_NAMESPACE::list<T>::const_iterator it = lst.begin(), ite = lst.end();
+		typename TEST_NS::list<T>::const_iterator it = lst.begin(), ite = lst.end();
 		std::cout << std::endl << "Content is:" << std::endl;
 		for (; it != ite; ++it)
 			std::cout << "- " << *it << std::endl;
@@ -55,13 +59,13 @@ void	printSize(TESTED_NAMESPACE::list<T> const &lst, bool print_content = 1)
 	std::cout << "###############################################" << std::endl;
 }
 
-void	checkErase(TESTED_NAMESPACE::list<TESTED_TYPE> const &lst,
-					TESTED_NAMESPACE::list<TESTED_TYPE>::const_iterator const &it)
+void	checkErase(TEST_NS::list<TESTED_TYPE> const &lst,
+					TEST_NS::list<TESTED_TYPE>::const_iterator const &it)
 {
 	static int i = 0;
 
 	int j = 0;
-	TESTED_NAMESPACE::list<TESTED_TYPE>::const_iterator ite = lst.begin();
+	TEST_NS::list<TESTED_TYPE>::const_iterator ite = lst.begin();
 	while (it != ite--)
 		++j;
 
@@ -106,7 +110,7 @@ int			main()
 	std::cout << "=========================== push_back test ============================" << std::endl;
 
 
-	ft::list<int> list_push_back1;
+	TEST_NS::list<int> list_push_back1;
 
 	list_push_back1.push_back(1);
 	list_push_back1.push_back(2);
@@ -114,13 +118,13 @@ int			main()
 	list_push_back1.push_back(4);
 	list_push_back1.push_back(5);
 
-	for (ft::list<int>::iterator iter = list_push_back1.begin(); iter != list_push_back1.end(); iter++)
+	for (TEST_NS::list<int>::iterator iter = list_push_back1.begin(); iter != list_push_back1.end(); iter++)
 		std::cout << *iter << " ";
 	std::cout << std::endl;
 	std::cout << "list_push_back1 stores " << list_push_back1.size() << " numbers.\n";
 	
 	
-	ft::list<test> list_push_back2;
+	TEST_NS::list<test> list_push_back2;
 	
 	list_push_back2.push_back(test(3,5));
 	list_push_back2.push_back(test(1,22));
@@ -131,7 +135,7 @@ int			main()
 
 	list_push_back2.clear();
 
-	for (ft::list<test>::iterator iter = list_push_back2.begin(); iter != list_push_back2.end(); iter++)
+	for (TEST_NS::list<test>::iterator iter = list_push_back2.begin(); iter != list_push_back2.end(); iter++)
 		std::cout << iter->x << ", " << iter->y << " || ";
 	std::cout << std::endl;
 	
@@ -141,7 +145,7 @@ int			main()
 	list_push_back2.push_back(test(2,33));
 	list_push_back2.push_back(test(5,511));
 	
-	for (ft::list<test>::iterator iter = list_push_back2.begin(); iter != list_push_back2.end(); iter++)
+	for (TEST_NS::list<test>::iterator iter = list_push_back2.begin(); iter != list_push_back2.end(); iter++)
 		std::cout << iter->x << ", " << iter->y << " || ";
 	std::cout << std::endl;
 	
@@ -153,12 +157,12 @@ int			main()
 
 	std::cout << "=========================== push_front test ===========================" << std::endl;
 
-	ft::list<int> list_push_front1 (2,100);         // two ints with a value of 100
+	TEST_NS::list<int> list_push_front1 (2,100);         // two ints with a value of 100
 	list_push_front1.push_front (200);
 	list_push_front1.push_front (300);
 
 	std::cout << "mylist contains:";
-	for (ft::list<int>::iterator it=list_push_front1.begin(); it!=list_push_front1.end(); ++it)
+	for (TEST_NS::list<int>::iterator it=list_push_front1.begin(); it!=list_push_front1.end(); ++it)
 	  std::cout << ' ' << *it;
 
   	std::cout << '\n';
@@ -170,8 +174,8 @@ int			main()
 
 	std::cout << "=========================== insert test ========================" << std::endl;
 
-	ft::list<int> list_insert_test;
-	ft::list<int>::iterator it_insert_test;
+	TEST_NS::list<int> list_insert_test;
+	TEST_NS::list<int>::iterator it_insert_test;
 
   // set some initial values:
 	for (int i=1; i<=5; ++i) list_insert_test.push_back(i); // 1 2 3 4 5
@@ -208,7 +212,7 @@ int			main()
 
 	std::cout << "=========================== resize test ========================" << std::endl;
 
-	ft::list<int> list_resize_test;
+	TEST_NS::list<int> list_resize_test;
 
 	// set some initial content:
 	for (int i=1; i<10; ++i) list_resize_test.push_back(i);
@@ -218,7 +222,7 @@ int			main()
 	list_resize_test.resize(12);
 
   	std::cout << "list_resize_test contains:";
-  	for (ft::list<int>::iterator it=list_resize_test.begin(); it!=list_resize_test.end(); ++it)
+  	for (TEST_NS::list<int>::iterator it=list_resize_test.begin(); it!=list_resize_test.end(); ++it)
    	std::cout << ' ' << *it;
 
  	std::cout << '\n';
@@ -227,22 +231,22 @@ int			main()
 
 	std::cout << "=========================== splice test ========================" << std::endl;
 
-	ft::list<int> list_splice_test1;
+	TEST_NS::list<int> list_splice_test1;
 
 	list_splice_test1.push_back(2);
 	list_splice_test1.push_back(3);
 	list_splice_test1.push_back(4);
 
-	ft::list<int>::iterator iter_splice_test1 = list_splice_test1.begin();
+	TEST_NS::list<int>::iterator iter_splice_test1 = list_splice_test1.begin();
 	iter_splice_test1++;
 	
-	ft::list<int> list_splice_test2;
+	TEST_NS::list<int> list_splice_test2;
 
 	list_splice_test2.push_back(22);
 	list_splice_test2.push_back(23);
 	list_splice_test2.push_back(24);
 
-	ft::list<int>::iterator iter_splice_test2 = list_splice_test2.begin();
+	TEST_NS::list<int>::iterator iter_splice_test2 = list_splice_test2.begin();
 	iter_splice_test2++;
 
 	list_splice_test1.splice(iter_splice_test1, list_splice_test2, list_splice_test2.begin(), iter_splice_test2);
@@ -253,13 +257,13 @@ int			main()
 
 
 
-	for(ft::list<int>::iterator iter = list_splice_test1.begin(); iter != list_splice_test1.end(); iter++)
+	for(TEST_NS::list<int>::iterator iter = list_splice_test1.begin(); iter != list_splice_test1.end(); iter++)
 		std::cout << *iter << " ";
 	std::cout << std::endl;
 
 
-	ft::list<int> list_splice_test3, list_splice_test4;
-	ft::list<int>::iterator iter_splice_test3;
+	TEST_NS::list<int> list_splice_test3, list_splice_test4;
+	TEST_NS::list<int>::iterator iter_splice_test3;
 
   // set some initial values:
 	for (int i=1; i<=4; ++i)
@@ -300,12 +304,12 @@ int			main()
 
 
 	int myints_remove[]= {17,89,7,14};
-	ft::list<int> list_remove1(myints_remove,myints_remove+4);
+	TEST_NS::list<int> list_remove1(myints_remove,myints_remove+4);
 
 	list_remove1.push_back(89);
 
 	std::cout << "mylist contains:";
-	for (ft::list<int>::iterator it=list_remove1.begin(); it!=list_remove1.end(); ++it)
+	for (TEST_NS::list<int>::iterator it=list_remove1.begin(); it!=list_remove1.end(); ++it)
 		std::cout << ' ' << *it;
 	std::cout << '\n';
 
@@ -313,7 +317,7 @@ int			main()
 	list_remove1.remove(89);
 
 	std::cout << "mylist contains:";
-	for (ft::list<int>::iterator it=list_remove1.begin(); it!=list_remove1.end(); ++it)
+	for (TEST_NS::list<int>::iterator it=list_remove1.begin(); it!=list_remove1.end(); ++it)
 		std::cout << ' ' << *it;
 	std::cout << '\n';
 
@@ -324,14 +328,14 @@ int			main()
 	
 
 	int myints_remove_if[]= {15,36,7,17,20,39,4,1};
-	ft::list<int> list_remove_if1 (myints_remove_if,myints_remove_if+8);   // 15 36 7 17 20 39 4 1
+	TEST_NS::list<int> list_remove_if1 (myints_remove_if,myints_remove_if+8);   // 15 36 7 17 20 39 4 1
 
 	list_remove_if1.remove_if (single_digit);           // 15 36 17 20 39
 
 	list_remove_if1.remove_if (is_odd());               // 36 20
 
 	std::cout << "mylist contains:";
-	for (ft::list<int>::iterator it=list_remove_if1.begin(); it!=list_remove_if1.end(); ++it)
+	for (TEST_NS::list<int>::iterator it=list_remove_if1.begin(); it!=list_remove_if1.end(); ++it)
 		std::cout << ' ' << *it;
 	std::cout << '\n';
 
@@ -342,13 +346,13 @@ int			main()
 
 	double mydoubles_unique[]={ 12.15,  2.72, 73.0,  12.77,  3.14,
                        12.77, 73.35, 72.25, 15.3,  72.25 };
-	ft::list<double> list_unique1 (mydoubles_unique,mydoubles_unique+10);
+	TEST_NS::list<double> list_unique1 (mydoubles_unique,mydoubles_unique+10);
   
 	list_unique1.sort();             //  2.72,  3.14, 12.15, 12.77, 12.77,
                              // 15.3,  72.25, 72.25, 73.0,  73.35
 
 	list_unique1.unique();
-	for (ft::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
+	for (TEST_NS::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
 		std::cout << *iter << " ";
 	std::cout << std::endl;
 
@@ -357,20 +361,20 @@ int			main()
 
 	list_unique1.unique (same_integral_part);  //  2.72,  3.14, 12.15
                                        // 15.3,  72.25, 73.0
-	for (ft::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
+	for (TEST_NS::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
 		std::cout << *iter << " ";
 	std::cout << std::endl;
 	
 	list_unique1.unique (is_near());           //  2.72, 12.15, 72.25
-	for (ft::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
+	for (TEST_NS::list<double>::iterator iter = list_unique1.begin(); iter != list_unique1.end(); iter ++)
 		std::cout << *iter << " ";
 	std::cout << std::endl;
 	std::cout << "=========================== unique test end =========================" << std::endl;
 
 	std::cout << "=========================== sort test start =========================" << std::endl;
 	
-	ft::list<std::string> list_sort1;
-	ft::list<std::string>::iterator iter_sort1;
+	TEST_NS::list<std::string> list_sort1;
+	TEST_NS::list<std::string>::iterator iter_sort1;
 	list_sort1.push_back ("one");
 	list_sort1.push_back ("two");
 	list_sort1.push_back ("Three");
@@ -394,7 +398,7 @@ int			main()
 
 	std::cout << "=========================== merge test start ============================" << std::endl;
 	
-	ft::list<double> list_merge_first, list_merge_second;
+	TEST_NS::list<double> list_merge_first, list_merge_second;
 
 	list_merge_first.push_back (3.1);
 	list_merge_first.push_back (2.2);
@@ -416,7 +420,7 @@ int			main()
 	list_merge_first.merge(list_merge_second,mycomparison);
 
   	std::cout << "first contains:";
-  	for (ft::list<double>::iterator it=list_merge_first.begin(); it!=list_merge_first.end(); ++it)
+  	for (TEST_NS::list<double>::iterator it=list_merge_first.begin(); it!=list_merge_first.end(); ++it)
     	std::cout << ' ' << *it;
   	std::cout << '\n';
 
@@ -427,48 +431,61 @@ int			main()
 
 
 	std::cout << "=========================== reverse test start ============================" << std::endl;
-  	ft::list<int> list_reverse;
+  	TEST_NS::list<int> list_reverse;
 
   	for (int i=1; i<10; ++i) list_reverse.push_back(i);
 
   	list_reverse.reverse();
 
   	std::cout << "mylist contains:";
-  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  	for (TEST_NS::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
   		std::cout << ' ' << *it;
 	std::cout << '\n';
 
 	list_reverse.clear();
   	std::cout << "mylist contains:";
-  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  	for (TEST_NS::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
   		std::cout << ' ' << *it;
 	std::cout << '\n';
 
 	list_reverse.reverse();
   	std::cout << "mylist contains:";
-  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  	for (TEST_NS::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
   		std::cout << ' ' << *it;
 	std::cout << '\n';
 
 	list_reverse.push_back(55);
 	list_reverse.reverse();
   	std::cout << "mylist contains:";
-  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  	for (TEST_NS::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
   		std::cout << ' ' << *it;
 	std::cout << '\n';	
 
 	list_reverse.push_back(40);
 	list_reverse.reverse();
   	std::cout << "mylist contains:";
-  	for (ft::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
+  	for (TEST_NS::list<int>::iterator it=list_reverse.begin(); it!=list_reverse.end(); ++it)
   		std::cout << ' ' << *it;
 	std::cout << '\n';		
 	std::cout << "=========================== reverse test end ==============================" << std::endl;
 
-	std::cout << "=========================== operator test start ==============================" << std::endl;
 
 
-	
+	std::cout << "=========================== sort iterator invalid test start ==============================" << std::endl;
+
+	TEST_NS::list<int> list_sort2;
+
+	list_sort2.push_back(3);
+	list_sort2.push_back(-99999);
+	list_sort2.push_back(2);
+	list_sort2.push_back(5);
+
+	TEST_NS::list<int>::iterator iter_sort2 = list_sort2.begin();
+	list_sort2.sort();
+	for(; iter_sort2 != list_sort2.end(); iter_sort2++)
+		std::cout << *iter_sort2 << std::endl;
+
+	std::cout << "=========================== sort iterator invalid test end ==============================" << std::endl;
 
 	return (0);
 }

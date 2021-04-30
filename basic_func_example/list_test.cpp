@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 14:47:59 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/26 21:05:52 by honlee           ###   ########.fr       */
+/*   Updated: 2021/04/30 14:34:46 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,14 +201,19 @@ int		main()
 	
 	std::list<int> list;
 
+	list.push_back(3);
 	list.push_back(-99999);
 	list.push_back(2);
-	list.push_back(3);
 	list.push_back(5);
 
-	std::list<int>::reverse_iterator riter = list.rbegin();
-	riter++;
-	std::cout << *riter << std::endl;
-	std::cout << *(riter.base()) << std::endl;
-	//std::list<int>::iterator iter2 = 
+	// std::list<int>::reverse_iterator riter = list.rbegin();
+	// riter++;
+	// std::cout << *riter << std::endl;
+	// std::cout << *(riter.base()) << std::endl;
+	// //std::list<int>::iterator iter2 = 
+
+	std::list<int>::iterator b_iter = list.begin();
+	list.sort();
+	for(; b_iter != list.end(); b_iter++)
+		std::cout << *b_iter << std::endl;
 }
