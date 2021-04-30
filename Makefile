@@ -3,15 +3,15 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
+#    By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/30 15:00:58 by honlee           ###   ########.fr        #
+#    Updated: 2021/04/30 23:10:43 by honlee           ###   ########seoul.kr   #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS		=		\
-					list_main.cpp\
+					queue_main.cpp\
 
 NAME		=		a.out
 
@@ -28,16 +28,20 @@ dbg			:		fclean
 					lldb a.out
 
 test		:		fclean
-					${CC} ${DCF} -o ${NAME} -D TEST_NS=ft
-					./a.out > ft_out.txt
 					${CC} ${DCF} -o ${NAME} -D TEST_NS=std
 					./a.out > std_out.txt
+					${CC} ${DCF} -o ${NAME} -D TEST_NS=ft
+					./a.out > ft_out.txt
 					diff ft_out.txt std_out.txt > diff.txt
 					@echo "===================== diff.txt ====================="
 					@cat diff.txt
 					@echo "=================== diff.txt end ==================="
+					@echo "=================== leaks test start ===================="
+					@leaks -atExit -- ./a.out > leaks_out.txt
+					@echo "=================== leaks test end ======================"
 					rm -rf a.out
 					rm -rf a.out.dSYM
+
 
 fclean		:		
 					rm -f ${NAME}
@@ -45,6 +49,7 @@ fclean		:
 					rm -rf ft_out.txt
 					rm -rf std_out.txt
 					rm -rf diff.txt
+					rm -rf leaks_out.txt
 
 re			:		fclean all
 
