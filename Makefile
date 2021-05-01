@@ -6,12 +6,12 @@
 #    By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/04/30 23:10:43 by honlee           ###   ########seoul.kr   #
+#    Updated: 2021/05/01 10:37:16 by honlee           ###   ########seoul.kr   #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS		=		\
-					queue_main.cpp\
+					map_main.cpp\
 
 NAME		=		a.out
 
@@ -28,9 +28,9 @@ dbg			:		fclean
 					lldb a.out
 
 test		:		fclean
-					${CC} ${DCF} -o ${NAME} -D TEST_NS=std
+					${CC} ${CF} -o ${NAME} -D TEST_NS=std
 					./a.out > std_out.txt
-					${CC} ${DCF} -o ${NAME} -D TEST_NS=ft
+					${CC} ${CF} -o ${NAME} -D TEST_NS=ft
 					./a.out > ft_out.txt
 					diff ft_out.txt std_out.txt > diff.txt
 					@echo "===================== diff.txt ====================="

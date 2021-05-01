@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   BST.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 11:07:41 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/30 12:31:40 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/01 09:55:44 by honlee           ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -364,6 +364,22 @@ namespace ft
 			node<TK, TV, Compare>*		getParent()
 			{
 				return (this->parent);
+			}
+	};
+
+	template <typename TK, typename TV, class Compare = ft::less<TK> >
+	class saver
+	{
+		public	:
+			node<TK, TV, Compare>* root;
+		
+			saver(node<TK, TV, Compare>* root = NULL) : root(root){}
+			~saver(){}
+			saver(const saver<TK, TV, Compare>& origin) : root(origin.root){}
+			saver& operator=(const saver<TK, TV, Compare>& origin)
+			{
+				this->root = origin.root;
+				return (*this);
 			}
 	};
 }

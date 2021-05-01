@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 04:20:32 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/30 00:09:45 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/01 10:10:06 by honlee           ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,13 @@ namespace ft
 		private :
 			node<TK, TV, Compare>	*root;
 			unsigned int				noe;
-			
+			saver<TK, TV, Compare>  *sv;
+
+			void	setSV()
+			{
+				sv->root = root;
+			}
+
 		public	:
 			typedef TK key_type;
 			typedef TV mapped_type;
@@ -86,6 +92,7 @@ namespace ft
 			{				
 				(void)comp;
 				(void)alloc;
+				sv = new saver<TK, TV, Compare>();
 			}
 
 			//range
@@ -94,7 +101,7 @@ namespace ft
 			{				
 				(void)comp;
 				(void)alloc;
-
+				sv = new saver<TK, TV, Compare>();
 				insert(first, last);			
 			}
 			
@@ -104,7 +111,8 @@ namespace ft
 				//std::cout << "copy constrcutor called" << std::endl;
 				this->root = new node<TK, TV, Compare>(* x.root);
 				this->noe = x.noe;
-
+				sv = new saver<TK, TV, Compare>();
+				setSV();
 			}
 
 			map<TK, TV, Compare, Alloc>& operator= (const map& x)
@@ -112,6 +120,7 @@ namespace ft
 				this->root->deleteAll(this->root); // 가지고 있던 모든 것 파괴
 				this->root = new node<TK, TV, Compare>(* x.root);
 				this->noe = x.noe;
+				setSV();
 				return (*this);
 			}
 
@@ -119,6 +128,7 @@ namespace ft
 			{
 				if (noe > 0)
 					this->root->deleteAll(this->root);
+				delete (sv);
 			}
 
 			//////////////////////////////////////////////////////////////////
@@ -131,42 +141,42 @@ namespace ft
 
 			iterator begin()
 			{
-				return (iterator(root->getLeftest(root), root));
+				return (iterator(root->getLeftest(root), sv));
 			}
 
 			const_iterator begin() const
 			{
-				return (const_iterator(root->getLeftest(root), root));
+				return (const_iterator(root->getLeftest(root), sv));
 			}
 
 			iterator end()
 			{
-				return (iterator(NULL, root));
+				return (iterator(NULL, sv));
 			}
 
 			const_iterator end() const
 			{
-				return (const_iterator(NULL, root));
+				return (const_iterator(NULL, sv));
 			}
 
 			reverse_iterator rbegin()
 			{
-				return (reverse_iterator(root->getRightest(root), root));
+				return (reverse_iterator(root->getRightest(root), sv));
 			}
 
 			const_reverse_iterator rbegin() const
 			{
-				return (const_reverse_iterator(root->getRightest(root), root));
+				return (const_reverse_iterator(root->getRightest(root), sv));
 			}
 
 			reverse_iterator rend()
 			{
-				return (reverse_iterator(NULL, root));
+				return (reverse_iterator(NULL, sv));
 			}
 
 			const_reverse_iterator rend() const
 			{
-				return (const_reverse_iterator(NULL, root));
+				return (const_reverse_iterator(NULL, sv));
 			}
 
 			//////////////////////////////////////////////////////////////////
@@ -209,6 +219,7 @@ namespace ft
 				{
 					noe++;
 					root = new node<TK, TV, Compare>(key);
+					setSV();
 					return (root->ip.second);
 				}
 				else
@@ -241,19 +252,20 @@ namespace ft
 				{
 					noe++;
 					root = new node<TK, TV, Compare>(val.first, val.second);
-					return (pair<iterator, bool>(iterator(root, root), true));
+					setSV();
+					return (pair<iterator, bool>(iterator(root, sv), true));
 				}
 				else
 				{
 					if ((ret = root->find(root, val.first)) != NULL) // 찾았다 (존재한다.)
 					{
-						return (pair<iterator, bool>(iterator(ret, root), false));
+						return (pair<iterator, bool>(iterator(ret, sv), false));
 					}
 					else
 					{
 						noe++;
 						ret = root->mergeInsert(root, val.first, val.second);
-						return (pair<iterator, bool>(iterator(ret, root), true));
+						return (pair<iterator, bool>(iterator(ret, sv), true));
 					}
 				}
 			}
@@ -285,9 +297,13 @@ namespace ft
 					if (root->find(root, k) != NULL)
 					{
 						root->deleteNode(&root, root, k);
+						setSV();
 						noe--;
 						if (noe == 0)
+						{
 							root = NULL;
+							setSV();
+						}
 						return (1);
 					}
 					else
@@ -358,15 +374,15 @@ namespace ft
 			iterator find (const key_type& k)
 			{
 				if (noe == 0)
-					return (iterator(NULL, root));
-				return (iterator(root->find(root, k), root));
+					return (iterator(NULL, sv));
+				return (iterator(root->find(root, k), sv));
 			}
 
 			const_iterator find (const key_type& k) const
 			{
 				if (noe == 0)
-					return (const_iterator(NULL, root));
-				return (const_iterator( root->find(root, k), root ) );
+					return (const_iterator(NULL, sv));
+				return (const_iterator( root->find(root, k), sv ) );
 			}
 
 			size_type count (const key_type& k) const
@@ -382,33 +398,33 @@ namespace ft
 			iterator lower_bound (const key_type& k)
 			{
 				if (noe == 0)
-					return (iterator(NULL, root));
+					return (iterator(NULL, sv));
 				else
-					return (iterator(root->getLowerBound(root, k), root));
+					return (iterator(root->getLowerBound(root, k), sv));
 			}
 
 			const_iterator lower_bound (const key_type& k) const
 			{
 				if (noe == 0)
-					return (const_iterator(NULL, root));
+					return (const_iterator(NULL, sv));
 				else
-					return (const_iterator(root->getLowerBound(root, k), root));
+					return (const_iterator(root->getLowerBound(root, k), sv));
 			}
 
 			iterator upper_bound (const key_type& k)
 			{
 				if (noe == 0)
-					return (iterator(NULL, root));
+					return (iterator(NULL, sv));
 				else
-					return (iterator(root->getUpperBound(root, k), root));
+					return (iterator(root->getUpperBound(root, k), sv));
 			}
 
 			const_iterator upper_bound (const key_type& k) const
 			{
 				if (noe == 0)
-					return (const_iterator(NULL, root));
+					return (const_iterator(NULL, sv));
 				else
-					return (const_iterator(root->getUpperBound(root, k), root));
+					return (const_iterator(root->getUpperBound(root, k), sv));
 			}
 
 			pair<iterator,iterator>             equal_range (const key_type& k)

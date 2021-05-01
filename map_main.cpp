@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_main.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 11:50:10 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/30 01:06:14 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/01 10:40:20 by honlee           ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -580,10 +580,45 @@ TEST_TV			main()
 	map_const['c'] = 3;
 	map_const['d'] = 4;
 
-	TEST_NS::map<TEST_TK, TEST_TV>::const_iterator c_iter = map_const.begin();
+	//TEST_NS::map<TEST_TK, TEST_TV>::const_iterator c_iter = map_const.begin();
 	//c_iter->second = 11;
 
 	
 
 	std::cout << "==================== const iter test start ==============================" << std::endl;
+
+
+	std::cout << "==================== tricky erase iterator start ==============================" << std::endl;
+	
+
+	TEST_NS::map<int, int> map_teis;
+
+	map_teis[4] = 4;
+	map_teis[3] = 3;
+	map_teis[1] = 1;
+	map_teis[7] = 7;
+
+	for (TEST_NS::map<int, int>::iterator iter = map_teis.begin(); iter != map_teis.end(); iter++)
+		std::cout << iter->first << " | " << iter->second << std::endl;
+	
+	std::cout << "after earse" << std::endl;
+	TEST_NS::map<int, int>::iterator iter = map_teis.begin();
+	std::cout << "this iter : " << iter ->first << " | " << iter->second << std::endl;
+
+	iter++; // iter-> 3
+	iter++; // iter -> 4
+	iter++; // iter -> 7
+	iter++; // iter -> end;
+
+	map_teis.erase(4); // delete begin (4); (root node)
+
+	std::cout << "--iter" << std::endl;
+	iter--;
+	std::cout << "this iter : " << iter ->first << " | " << iter->second << std::endl;
+
+	for (TEST_NS::map<int, int>::iterator iter = map_teis.begin(); iter != map_teis.end(); iter++)
+		std::cout << iter->first << " | " << iter->second << std::endl;
+	
+	std::cout << "==================== tricky erase iterator end ==============================" << std::endl;
+
 }
