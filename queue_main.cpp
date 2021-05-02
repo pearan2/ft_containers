@@ -6,12 +6,16 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/30 12:21:56 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/30 14:24:23 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/02 16:14:45 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "queue.hpp"
 #include <queue>
+
+#ifndef LEAK_TEST
+# define LEAK_TEST 0
+#endif
 
 #ifndef TEST_NS
 # define TEST_NS ft
@@ -99,5 +103,7 @@ int		main()
 	
 	std::cout << "===================== push and pop test end =========================" << std::endl;
 
+	if (LEAK_TEST != 0)
+		system("leaks a.out > leaks_result; cat leaks_result | grep leaked > leaks_out && rm -rf leaks_result");
 
 }

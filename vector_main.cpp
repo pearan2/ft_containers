@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/26 22:33:37 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/27 19:33:56 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/02 16:15:41 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 #include <string>
 #include <vector>
 #include "vector.hpp"
+
+#ifndef LEAK_TEST
+# define LEAK_TEST 0
+#endif
+
 
 #ifndef TEST_NS
 # define TEST_NS ft
@@ -395,8 +400,6 @@ int		main()
 	TEST_NS::vector<int> vec_expand;
 	vec_expand.push_back(1);
 	
-	TEST_NS::vector<int>::iterator iter_expand = vec_expand.begin(); // old begin set
-
 	for (int i=0; i<100; i++)
 		vec_expand.push_back(i);
 
@@ -405,6 +408,12 @@ int		main()
 	std::cout << std::endl;
 
 	std::cout << "===================== expand arr test end ===========" << std::endl;
+
+
+
+	if (LEAK_TEST != 0)
+		system("leaks a.out > leaks_result; cat leaks_result | grep leaked > leaks_out && rm -rf leaks_result");
+
 
 	return 0;
 }

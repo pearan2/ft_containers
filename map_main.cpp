@@ -3,20 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   map_main.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 11:50:10 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/01 10:40:20 by honlee           ###   ########seoul.kr  */
+/*   Updated: 2021/05/02 16:08:45 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BST.hpp"
 #include <string>
 #include <iostream>
+#include <stdlib.h>
 #include "map_iterator.hpp"
 #include <map>
 #include "map.hpp"
 #include <list>
+
+#ifndef LEAK_TEST
+# define LEAK_TEST 0
+#endif
 
 #ifndef TEST_NS
 # define TEST_NS ft
@@ -621,4 +626,7 @@ TEST_TV			main()
 	
 	std::cout << "==================== tricky erase iterator end ==============================" << std::endl;
 
+
+	if (LEAK_TEST != 0)
+		system("leaks a.out > leaks_result; cat leaks_result | grep leaked > leaks_out && rm -rf leaks_result");
 }

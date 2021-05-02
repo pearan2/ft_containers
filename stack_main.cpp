@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/30 11:54:17 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/30 12:05:14 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/02 16:14:49 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 #include <stack>
 #include <iostream>
 #include <string>
+
+#ifndef LEAK_TEST
+# define LEAK_TEST 0
+#endif
 
 #ifndef TEST_NS
 # define TEST_NS ft
@@ -79,4 +83,9 @@ int			main()
 	std::cout << '\n';
 
 	std::cout << "==================== push pop test end =======================" << std::endl;
+
+	if (LEAK_TEST != 0)
+		system("leaks a.out > leaks_result; cat leaks_result | grep leaked > leaks_out && rm -rf leaks_result");
+
+
 }

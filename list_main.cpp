@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/21 18:56:50 by honlee            #+#    #+#             */
-/*   Updated: 2021/04/30 15:02:30 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/02 16:13:57 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,14 @@
 #include <iterator>
 #include <string>
 #include <iostream>
+#include <stdlib.h>
 
 #ifndef TEST_NS
 # define TEST_NS ft
+#endif
+
+#ifndef LEAK_TEST
+# define LEAK_TEST 0
 #endif
 
 #define TESTED_TYPE int
@@ -486,6 +491,11 @@ int			main()
 		std::cout << *iter_sort2 << std::endl;
 
 	std::cout << "=========================== sort iterator invalid test end ==============================" << std::endl;
+
+
+	if (LEAK_TEST != 0)
+		system("leaks a.out > leaks_result; cat leaks_result | grep leaked > leaks_out && rm -rf leaks_result");
+
 
 	return (0);
 }
